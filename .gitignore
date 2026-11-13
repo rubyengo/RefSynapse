@@ -1,0 +1,31 @@
+# Кэш Python — в git не нужен
+__pycache__/
+*.py[cod]
+
+# Портативный Python — живёт рядом с кодом, но не в git
+/python/
+/Python/
+/runtime/
+
+# Данные и логи приложения (основные лежат в APP_DIR выше репо, это страховка)
+data/
+*.autosave
+*.log
+settings.json
+
+# Личные рабочие заметки (хендоверы) — не для публики
+HANDOFF*.md
+
+# Тесты и сборка
+.pytest_cache/
+venv/
+.venv/
+build/
+dist/
+*.spec
+
+# Служебное IDE и Windows
+.idea/
+.vscode/
+Thumbs.db
+desktop.ini
