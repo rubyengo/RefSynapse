@@ -1,0 +1,608 @@
+[
+ {
+  "page": 5,
+  "id": "b1",
+  "size": 14.0,
+  "text": "Chapter 2 Hardware Installation"
+ },
+ {
+  "page": 5,
+  "id": "b2",
+  "size": 12.0,
+  "text": "2-1 Installation Precautions"
+ },
+ {
+  "page": 5,
+  "id": "b3",
+  "size": 9.0,
+  "text": "The motherboard contains numerous delicate electronic circuits and components which can become\ndamaged as a result of electrostatic discharge (ESD). Prior to installation, carefully read the user's\nmanual and follow these procedures:"
+ },
+ {
+  "page": 5,
+  "id": "b4",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b5",
+  "size": 9.0,
+  "text": "Prior to installation, make sure the chassis is suitable for the motherboard."
+ },
+ {
+  "page": 5,
+  "id": "b6",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b7",
+  "size": 9.0,
+  "text": "Prior to installation, do not remove or break motherboard S/N (Serial Number) sticker or\nwarranty sticker provided by your dealer. These stickers are required for warranty validation."
+ },
+ {
+  "page": 5,
+  "id": "b8",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b9",
+  "size": 9.0,
+  "text": "Always remove the AC power by unplugging the power cord from the power outlet before\ninstalling or removing the motherboard or other hardware components."
+ },
+ {
+  "page": 5,
+  "id": "b10",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b11",
+  "size": 9.0,
+  "text": "When connecting hardware components to the internal connectors on the motherboard, make\nsure they are connected tightly and securely."
+ },
+ {
+  "page": 5,
+  "id": "b12",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b13",
+  "size": 9.0,
+  "text": "When handling the motherboard, avoid touching any metal leads or connectors."
+ },
+ {
+  "page": 5,
+  "id": "b14",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b15",
+  "size": 9.0,
+  "text": "It is best to wear an electrostatic discharge (ESD) wrist strap when handling electronic\ncomponents such as a motherboard, CPU or memory. If you do not have an ESD wrist strap,\nkeep your hands dry and first touch a metal object to eliminate static electricity."
+ },
+ {
+  "page": 5,
+  "id": "b16",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b17",
+  "size": 9.0,
+  "text": "Prior to installing the motherboard, please have it on top of an antistatic pad or within an\nelectrostatic shielding container."
+ },
+ {
+  "page": 5,
+  "id": "b18",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b19",
+  "size": 9.0,
+  "text": "Before connecting or unplugging the power supply cable from the motherboard, make sure\nthe power supply has been turned off."
+ },
+ {
+  "page": 5,
+  "id": "b20",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b21",
+  "size": 9.0,
+  "text": "Before turning on the power, make sure the power supply voltage has been set according to\nthe local voltage standard."
+ },
+ {
+  "page": 5,
+  "id": "b22",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b23",
+  "size": 9.0,
+  "text": "Before using the product, please verify that all cables and power connectors of your hardware\ncomponents are connected."
+ },
+ {
+  "page": 5,
+  "id": "b24",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b25",
+  "size": 9.0,
+  "text": "To prevent damage to the motherboard, do not allow screws to come in contact with the\nmotherboard circuit or its components."
+ },
+ {
+  "page": 5,
+  "id": "b26",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b27",
+  "size": 9.0,
+  "text": "Make sure there are no leftover screws or metal components placed on the motherboard or\nwithin the computer casing."
+ },
+ {
+  "page": 5,
+  "id": "b28",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b29",
+  "size": 9.0,
+  "text": "Do not place the computer system on an uneven surface."
+ },
+ {
+  "page": 5,
+  "id": "b30",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b31",
+  "size": 9.0,
+  "text": "Do not place the computer system in a high-temperature or wet environment."
+ },
+ {
+  "page": 5,
+  "id": "b32",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b33",
+  "size": 9.0,
+  "text": "Turning on the computer power during the installation process can lead to damage to system\ncomponents as well as physical harm to the user."
+ },
+ {
+  "page": 5,
+  "id": "b34",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b35",
+  "size": 9.0,
+  "text": "If you are uncertain about any installation steps or have a problem related to the use of the\nproduct, please consult a certified computer technician."
+ },
+ {
+  "page": 5,
+  "id": "b36",
+  "size": 9.0,
+  "text": "•"
+ },
+ {
+  "page": 5,
+  "id": "b37",
+  "size": 9.0,
+  "text": "If you use an adapter, extension power cable, or power strip, ensure to consult with its installation\nand/or grounding instructions."
+ },
+ {
+  "page": 5,
+  "id": "b38",
+  "size": 8.0,
+  "text": "- 5 -"
+ },
+ {
+  "page": 10,
+  "id": "b1",
+  "size": 12.0,
+  "text": "2-4 Installing the Memory"
+ },
+ {
+  "page": 10,
+  "id": "b2",
+  "size": 8.0,
+  "text": "Read the following guidelines before you begin to install the memory:"
+ },
+ {
+  "page": 10,
+  "id": "b3",
+  "size": 8.0,
+  "text": "•"
+ },
+ {
+  "page": 10,
+  "id": "b4",
+  "size": 8.0,
+  "text": "Make sure that the motherboard supports the memory. It is recommended that memory of the same\ncapacity, brand, speed, and chips be used. (Go to GIGABYTE's website for the latest supported\nmemory speeds and memory modules.)"
+ },
+ {
+  "page": 10,
+  "id": "b5",
+  "size": 8.0,
+  "text": "•"
+ },
+ {
+  "page": 10,
+  "id": "b6",
+  "size": 8.0,
+  "text": "Always turn off the computer and unplug the power cord from the power outlet before installing the\nmemory to prevent hardware damage."
+ },
+ {
+  "page": 10,
+  "id": "b7",
+  "size": 8.0,
+  "text": "•"
+ },
+ {
+  "page": 10,
+  "id": "b8",
+  "size": 8.0,
+  "text": "Memory modules have a foolproof design. A memory module can be installed in only one direction.\nIf you are unable to insert the memory, switch the direction."
+ },
+ {
+  "page": 10,
+  "id": "b9",
+  "size": 8.0,
+  "text": "•"
+ },
+ {
+  "page": 10,
+  "id": "b10",
+  "size": 8.0,
+  "text": "When installing memory modules, be sure to install in the DDR4_B1 socket first."
+ },
+ {
+  "page": 10,
+  "id": "b11",
+  "size": 9.0,
+  "text": "Dual Channel Memory Configuration"
+ },
+ {
+  "page": 10,
+  "id": "b12",
+  "size": 8.0,
+  "text": "This motherboard provides two memory sockets and supports Dual Channel Technology. After the memory\nis installed, the BIOS will automatically detect the specifications and capacity of the memory. Enabling Dual\nChannel memory mode will double the original memory bandwidth.\nThe two DDR4 memory sockets are divided into two channels and each channel has one memory socket as\nfollowing:"
+ },
+ {
+  "page": 10,
+  "id": "b13",
+  "size": 8.0,
+  "text": "\u001b"
+ },
+ {
+  "page": 10,
+  "id": "b14",
+  "size": 8.0,
+  "text": "Channel A: DDR4_A1"
+ },
+ {
+  "page": 10,
+  "id": "b15",
+  "size": 8.0,
+  "text": "\u001b"
+ },
+ {
+  "page": 10,
+  "id": "b16",
+  "size": 8.0,
+  "text": "Channel B: DDR4_B1"
+ },
+ {
+  "page": 10,
+  "id": "b17",
+  "size": 8.0,
+  "text": "Due to CPU limitations, read the following guidelines before installing the memory in Dual Channel mode.\n1."
+ },
+ {
+  "page": 10,
+  "id": "b18",
+  "size": 8.0,
+  "text": "Dual Channel mode cannot be enabled if only one memory module is installed."
+ },
+ {
+  "page": 10,
+  "id": "b19",
+  "size": 8.0,
+  "text": "2."
+ },
+ {
+  "page": 10,
+  "id": "b20",
+  "size": 8.0,
+  "text": "When enabling Dual Channel mode with two memory modules, it is recommended that memory of the\nsame capacity, brand, speed, and chips be used."
+ },
+ {
+  "page": 10,
+  "id": "b21",
+  "size": 5.5,
+  "text": "DDR4_A1"
+ },
+ {
+  "page": 10,
+  "id": "b22",
+  "size": 5.5,
+  "text": "DDR4_B1"
+ },
+ {
+  "page": 10,
+  "id": "b23",
+  "size": 8.0,
+  "text": "- 10 -"
+ },
+ {
+  "page": 12,
+  "id": "b1",
+  "size": 12.0,
+  "text": "2-6 Back Panel Connectors"
+ },
+ {
+  "page": 12,
+  "id": "b2",
+  "size": 9.0,
+  "text": "USB 2.0/1.1 Port"
+ },
+ {
+  "page": 12,
+  "id": "b3",
+  "size": 8.0,
+  "text": "The USB port supports the USB 2.0/1.1 specification. Use this port for USB devices."
+ },
+ {
+  "page": 12,
+  "id": "b4",
+  "size": 9.0,
+  "text": "PS/2 Keyboard/Mouse Port"
+ },
+ {
+  "page": 12,
+  "id": "b5",
+  "size": 8.0,
+  "text": "Use this port to connect a PS/2 mouse or keyboard."
+ },
+ {
+  "page": 12,
+  "id": "b6",
+  "size": 9.0,
+  "text": "D-Sub Port (Note 1)(Note 2)"
+ },
+ {
+  "page": 12,
+  "id": "b7",
+  "size": 8.0,
+  "text": "The D-Sub port supports a 15-pin D-Sub connector and supports a maximum resolution of 1920x1200@60 Hz\n(the actual resolutions supported depend on the monitor being used). Connect a monitor that supports\nD-Sub connection to this port."
+ },
+ {
+  "page": 12,
+  "id": "b8",
+  "size": 9.0,
+  "text": "HDMI Port (Note 1)"
+ },
+ {
+  "page": 12,
+  "id": "b9",
+  "size": 8.0,
+  "text": "The HDMI port is HDCP compliant and supports Dolby TrueHD and DTS HD\nMaster Audio formats. It also supports up to 192KHz/24bit 7.1-channel LPCM audio"
+ },
+ {
+  "page": 12,
+  "id": "b10",
+  "size": 8.0,
+  "text": "output. You can use this port to connect your HDMI-supported monitor. The maximum supported resolution is\n4096x2160@60 Hz, but the actual resolutions supported are dependent on the monitor being used."
+ },
+ {
+  "page": 12,
+  "id": "b11",
+  "size": 8.0,
+  "text": "After installing the HDMI device, make sure to set the default sound playback device to HDMI. (The\nitem name may differ depending on your operating system.)"
+ },
+ {
+  "page": 12,
+  "id": "b12",
+  "size": 9.0,
+  "text": "USB 3.2 Gen 1 Port"
+ },
+ {
+  "page": 12,
+  "id": "b13",
+  "size": 8.0,
+  "text": "The USB 3.2 Gen 1 port supports the USB 3.2 Gen 1 specification and is compatible to the USB 2.0\nspecification. Use this port for USB devices."
+ },
+ {
+  "page": 12,
+  "id": "b14",
+  "size": 9.0,
+  "text": "RJ-45 LAN Port"
+ },
+ {
+  "page": 12,
+  "id": "b15",
+  "size": 8.0,
+  "text": "The Gigabit Ethernet LAN port provides Internet connection at up to 1 Gbps data rate. The following\ndescribes the states of the LAN port LEDs."
+ },
+ {
+  "page": 12,
+  "id": "b16",
+  "size": 5.5,
+  "text": "Speed LED"
+ },
+ {
+  "page": 12,
+  "id": "b17",
+  "size": 5.5,
+  "text": "Activity LED"
+ },
+ {
+  "page": 12,
+  "id": "b18",
+  "size": 5.5,
+  "text": "Speed LED:"
+ },
+ {
+  "page": 12,
+  "id": "b19",
+  "size": 5.5,
+  "text": "Activity LED:"
+ },
+ {
+  "page": 12,
+  "id": "b20",
+  "size": 6.0,
+  "text": "State"
+ },
+ {
+  "page": 12,
+  "id": "b21",
+  "size": 6.0,
+  "text": "Description"
+ },
+ {
+  "page": 12,
+  "id": "b22",
+  "size": 6.0,
+  "text": "State"
+ },
+ {
+  "page": 12,
+  "id": "b23",
+  "size": 6.0,
+  "text": "Description"
+ },
+ {
+  "page": 12,
+  "id": "b24",
+  "size": 6.0,
+  "text": "Orange"
+ },
+ {
+  "page": 12,
+  "id": "b25",
+  "size": 6.0,
+  "text": "1 Gbps data rate"
+ },
+ {
+  "page": 12,
+  "id": "b26",
+  "size": 6.0,
+  "text": "Blinking"
+ },
+ {
+  "page": 12,
+  "id": "b27",
+  "size": 6.0,
+  "text": "Data transmission or receiving is occurring"
+ },
+ {
+  "page": 12,
+  "id": "b28",
+  "size": 6.0,
+  "text": "Green"
+ },
+ {
+  "page": 12,
+  "id": "b29",
+  "size": 6.0,
+  "text": "100 Mbps data rate"
+ },
+ {
+  "page": 12,
+  "id": "b30",
+  "size": 6.0,
+  "text": "Off"
+ },
+ {
+  "page": 12,
+  "id": "b31",
+  "size": 6.0,
+  "text": "No data transmission or receiving is occurring"
+ },
+ {
+  "page": 12,
+  "id": "b32",
+  "size": 6.0,
+  "text": "Off"
+ },
+ {
+  "page": 12,
+  "id": "b33",
+  "size": 6.0,
+  "text": "10 Mbps data rate"
+ },
+ {
+  "page": 12,
+  "id": "b34",
+  "size": 5.5,
+  "text": "LAN Port"
+ },
+ {
+  "page": 12,
+  "id": "b35",
+  "size": 8.0,
+  "text": "(Note 1) For AMD Ryzen ™ 5000 G-Series/4000 G-Series/3000 G-Series Processors only.\n(Note 2) Only for A520M K V2."
+ },
+ {
+  "page": 12,
+  "id": "b36",
+  "size": 8.0,
+  "text": "•"
+ },
+ {
+  "page": 12,
+  "id": "b37",
+  "size": 8.0,
+  "text": "When removing the cable connected to a back panel connector, first remove the cable from your\ndevice and then remove it from the motherboard."
+ },
+ {
+  "page": 12,
+  "id": "b38",
+  "size": 8.0,
+  "text": "•"
+ },
+ {
+  "page": 12,
+  "id": "b39",
+  "size": 8.0,
+  "text": "When removing the cable, pull it straight out from the connector. Do not rock it side to side to\nprevent an electrical short inside the cable connector."
+ },
+ {
+  "page": 12,
+  "id": "b40",
+  "size": 8.0,
+  "text": "- 12 -"
+ }
+]
