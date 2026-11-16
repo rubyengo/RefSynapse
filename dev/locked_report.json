@@ -1,0 +1,2260 @@
+{
+ "1": {
+  "mode": "inplace",
+  "ready_chars": 39,
+  "locked_with_letters": 319,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 319,
+    "codes": [
+     10
+    ],
+    "text": "GIGABYTE will reduce paper use in order to fulfill the responsibilities of a global citizen.\nAlso, to reduce the impacts"
+   }
+  ]
+ },
+ "2": {
+  "mode": "inplace",
+  "ready_chars": 300,
+  "locked_with_letters": 855,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 149,
+    "codes": [
+     10
+    ],
+    "text": "© 2023 GIGA-BYTE TECHNOLOGY CO., LTD. All rights reserved.\nThe trademarks mentioned in this manual are legally registere"
+   },
+   {
+    "id": "k2",
+    "chars": 357,
+    "codes": [
+     10,
+     132
+    ],
+    "text": "Information in this manual is protected by copyright laws and is the property of GIGABYTE.\nChanges to the specifications"
+   },
+   {
+    "id": "k4",
+    "chars": 93,
+    "codes": [
+     10
+    ],
+    "text": "For quick set-up of the product, refer to the Quick Installation Guide on GIGABYTE's\nwebsite."
+   },
+   {
+    "id": "k5",
+    "chars": 256,
+    "codes": [
+     10
+    ],
+    "text": "The revision number on your motherboard looks like this: \"REV: X.X.\" For example, \"REV: 1.0\"\nmeans the revision of the m"
+   }
+  ]
+ },
+ "3": {
+  "mode": "inplace",
+  "ready_chars": 1122,
+  "locked_with_letters": 0,
+  "locked": []
+ },
+ "4": {
+  "mode": "inplace",
+  "ready_chars": 322,
+  "locked_with_letters": 0,
+  "locked": []
+ },
+ "5": {
+  "mode": "inplace",
+  "ready_chars": 340,
+  "locked_with_letters": 2109,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 233,
+    "codes": [
+     10
+    ],
+    "text": "The motherboard contains numerous delicate electronic circuits and components which can become\ndamaged as a result of el"
+   },
+   {
+    "id": "k4",
+    "chars": 183,
+    "codes": [
+     10
+    ],
+    "text": "Prior to installation, do not remove or break motherboard S/N (Serial Number) sticker or\nwarranty sticker provided by yo"
+   },
+   {
+    "id": "k6",
+    "chars": 153,
+    "codes": [
+     10
+    ],
+    "text": "Always remove the AC power by unplugging the power cord from the power outlet before\ninstalling or removing the motherbo"
+   },
+   {
+    "id": "k8",
+    "chars": 133,
+    "codes": [
+     10
+    ],
+    "text": "When connecting hardware components to the internal connectors on the motherboard, make\nsure they are connected tightly "
+   },
+   {
+    "id": "k11",
+    "chars": 260,
+    "codes": [
+     10
+    ],
+    "text": "It is best to wear an electrostatic discharge (ESD) wrist strap when handling electronic\ncomponents such as a motherboar"
+   },
+   {
+    "id": "k13",
+    "chars": 127,
+    "codes": [
+     10
+    ],
+    "text": "Prior to installing the motherboard, please have it on top of an antistatic pad or within an\nelectrostatic shielding con"
+   },
+   {
+    "id": "k15",
+    "chars": 124,
+    "codes": [
+     10
+    ],
+    "text": "Before connecting or unplugging the power supply cable from the motherboard, make sure\nthe power supply has been turned "
+   },
+   {
+    "id": "k17",
+    "chars": 117,
+    "codes": [
+     10
+    ],
+    "text": "Before turning on the power, make sure the power supply voltage has been set according to\nthe local voltage standard."
+   },
+   {
+    "id": "k19",
+    "chars": 119,
+    "codes": [
+     10
+    ],
+    "text": "Before using the product, please verify that all cables and power connectors of your hardware\ncomponents are connected."
+   },
+   {
+    "id": "k21",
+    "chars": 124,
+    "codes": [
+     10
+    ],
+    "text": "To prevent damage to the motherboard, do not allow screws to come in contact with the\nmotherboard circuit or its compone"
+   },
+   {
+    "id": "k23",
+    "chars": 115,
+    "codes": [
+     10
+    ],
+    "text": "Make sure there are no leftover screws or metal components placed on the motherboard or\nwithin the computer casing."
+   },
+   {
+    "id": "k27",
+    "chars": 139,
+    "codes": [
+     10
+    ],
+    "text": "Turning on the computer power during the installation process can lead to damage to system\ncomponents as well as physica"
+   },
+   {
+    "id": "k29",
+    "chars": 150,
+    "codes": [
+     10
+    ],
+    "text": "If you are uncertain about any installation steps or have a problem related to the use of the\nproduct, please consult a "
+   },
+   {
+    "id": "k31",
+    "chars": 132,
+    "codes": [
+     10
+    ],
+    "text": "If you use an adapter, extension power cable, or power strip, ensure to consult with its installation\nand/or grounding i"
+   }
+  ]
+ },
+ "6": {
+  "mode": "facing",
+  "ready_chars": 1202,
+  "locked_with_letters": 670,
+  "locked": [
+   {
+    "id": "k9",
+    "chars": 90,
+    "codes": [
+     10
+    ],
+    "text": "2 x DDR4 DIMM sockets supporting up to 64 GB (32 GB single DIMM capacity)\nof system memory"
+   },
+   {
+    "id": "k13",
+    "chars": 83,
+    "codes": [
+     10
+    ],
+    "text": "Support for ECC Un-buffered DIMM 1Rx8/2Rx8 memory modules (operate in\nnon-ECC mode)"
+   },
+   {
+    "id": "k16",
+    "chars": 258,
+    "codes": [
+     10
+    ],
+    "text": "Support for Extreme Memory Profile (XMP) memory modules\n(The CPU and memory configuration may affect the supported memor"
+   },
+   {
+    "id": "k23",
+    "chars": 155,
+    "codes": [
+     10
+    ],
+    "text": "* You can change the functionality of an audio jack using the audio software. To\nconfigure 7.1-channel audio, access the"
+   },
+   {
+    "id": "k29",
+    "chars": 84,
+    "codes": [
+     10
+    ],
+    "text": "- 1 x M.2 connector (Socket 3, M key, type 2280 SATA and PCIe 3.0 x4/x2\nSSD support)"
+   }
+  ]
+ },
+ "7": {
+  "mode": "inplace",
+  "ready_chars": 969,
+  "locked_with_letters": 186,
+  "locked": [
+   {
+    "id": "k3",
+    "chars": 103,
+    "codes": [
+     10
+    ],
+    "text": "- 6 x USB 2.0/1.1 ports (2 ports on the back panel, 4 ports available through\nthe internal USB headers)"
+   },
+   {
+    "id": "k15",
+    "chars": 83,
+    "codes": [
+     10
+    ],
+    "text": "1 x Trusted Platform Module (TPM) header (2x6 pin, for the GC-TPM2.0_S\nmodule only)"
+   }
+  ]
+ },
+ "8": {
+  "mode": "inplace",
+  "ready_chars": 380,
+  "locked_with_letters": 404,
+  "locked": [
+   {
+    "id": "k2",
+    "chars": 164,
+    "codes": [
+     10
+    ],
+    "text": "* Available applications in APP Center may vary by motherboard model. Supported\nfunctions of each application may also v"
+   },
+   {
+    "id": "k9",
+    "chars": 133,
+    "codes": [
+     10
+    ],
+    "text": "* GIGABYTE reserves the right to make any changes to the product specifications and product-related information without\n"
+   },
+   {
+    "id": "k11",
+    "chars": 107,
+    "codes": [
+     10
+    ],
+    "text": "Please visit the SERVICE/SUPPORT\\Utility page on GIGABYTE's website to download the latest version\nof apps."
+   }
+  ]
+ },
+ "9": {
+  "mode": "inplace",
+  "ready_chars": 423,
+  "locked_with_letters": 1328,
+  "locked": [
+   {
+    "id": "k2",
+    "chars": 108,
+    "codes": [
+     10
+    ],
+    "text": "Make sure that the motherboard supports the CPU.\n(Go to GIGABYTE's website for the latest CPU support list.)"
+   },
+   {
+    "id": "k4",
+    "chars": 130,
+    "codes": [
+     10
+    ],
+    "text": "Always turn off the computer and unplug the power cord from the power outlet before installing the\nCPU to prevent hardwa"
+   },
+   {
+    "id": "k8",
+    "chars": 118,
+    "codes": [
+     10
+    ],
+    "text": "Do not turn on the computer if the CPU cooler is not installed, otherwise overheating and damage\nof the CPU may occur."
+   },
+   {
+    "id": "k10",
+    "chars": 412,
+    "codes": [
+     10
+    ],
+    "text": "Set the CPU host frequency in accordance with the CPU specifications. It is not recommended\nthat the system bus frequenc"
+   },
+   {
+    "id": "k11",
+    "chars": 295,
+    "codes": [
+     10
+    ],
+    "text": "Completely lift up the CPU socket locking lever. Locate the pin one (denoted by a small triangle) of the CPU\nsocket and "
+   },
+   {
+    "id": "k12",
+    "chars": 137,
+    "codes": [
+     10
+    ],
+    "text": "Do not force the CPU into the CPU socket before the CPU socket locking lever is lifted up, or\ndamage to the CPU and CPU "
+   },
+   {
+    "id": "k14",
+    "chars": 128,
+    "codes": [
+     10
+    ],
+    "text": "Please visit GIGABYTE's website for details on hardware installation.\nhttps://www.gigabyte.com/WebPage/210/quick-guide.h"
+   }
+  ]
+ },
+ "10": {
+  "mode": "facing",
+  "ready_chars": 331,
+  "locked_with_letters": 1143,
+  "locked": [
+   {
+    "id": "k2",
+    "chars": 222,
+    "codes": [
+     10
+    ],
+    "text": "Make sure that the motherboard supports the memory. It is recommended that memory of the same\ncapacity, brand, speed, an"
+   },
+   {
+    "id": "k4",
+    "chars": 133,
+    "codes": [
+     10
+    ],
+    "text": "Always turn off the computer and unplug the power cord from the power outlet before installing the\nmemory to prevent har"
+   },
+   {
+    "id": "k6",
+    "chars": 157,
+    "codes": [
+     10
+    ],
+    "text": "Memory modules have a foolproof design. A memory module can be installed in only one direction.\nIf you are unable to ins"
+   },
+   {
+    "id": "k8",
+    "chars": 383,
+    "codes": [
+     10
+    ],
+    "text": "This motherboard provides two memory sockets and supports Dual Channel Technology. After the memory\nis installed, the BI"
+   },
+   {
+    "id": "k11",
+    "chars": 107,
+    "codes": [
+     10
+    ],
+    "text": "Due to CPU limitations, read the following guidelines before installing the memory in Dual Channel mode.\n1."
+   },
+   {
+    "id": "k13",
+    "chars": 141,
+    "codes": [
+     10
+    ],
+    "text": "When enabling Dual Channel mode with two memory modules, it is recommended that memory of the\nsame capacity, brand, spee"
+   }
+  ]
+ },
+ "11": {
+  "mode": "inplace",
+  "ready_chars": 597,
+  "locked_with_letters": 460,
+  "locked": [
+   {
+    "id": "k2",
+    "chars": 116,
+    "codes": [
+     10
+    ],
+    "text": "Make sure the motherboard supports the expansion card. Carefully read the manual that came\nwith your expansion card."
+   },
+   {
+    "id": "k4",
+    "chars": 140,
+    "codes": [
+     10
+    ],
+    "text": "Always turn off the computer and unplug the power cord from the power outlet before installing an\nexpansion card to prev"
+   },
+   {
+    "id": "k5",
+    "chars": 89,
+    "codes": [
+     10
+    ],
+    "text": "Follow the steps below to correctly install your expansion card in the expansion slot.\n1."
+   },
+   {
+    "id": "k11",
+    "chars": 115,
+    "codes": [
+     10
+    ],
+    "text": "Turn on your computer. If necessary, go to BIOS Setup to make any required BIOS changes for your\nexpansion card(s)."
+   }
+  ]
+ },
+ "12": {
+  "mode": "inplace",
+  "ready_chars": 524,
+  "locked_with_letters": 1428,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 233,
+    "codes": [
+     10
+    ],
+    "text": "The D-Sub port supports a 15-pin D-Sub connector and supports a maximum resolution of 1920x1200@60 Hz\n(the actual resolu"
+   },
+   {
+    "id": "k2",
+    "chars": 149,
+    "codes": [
+     10
+    ],
+    "text": "The HDMI port is HDCP compliant and supports Dolby TrueHD and DTS HD\nMaster Audio formats. It also supports up to 192KHz"
+   },
+   {
+    "id": "k3",
+    "chars": 200,
+    "codes": [
+     10
+    ],
+    "text": "output. You can use this port to connect your HDMI-supported monitor. The maximum supported resolution is\n4096x2160@60 H"
+   },
+   {
+    "id": "k4",
+    "chars": 156,
+    "codes": [
+     10
+    ],
+    "text": "After installing the HDMI device, make sure to set the default sound playback device to HDMI. (The\nitem name may differ "
+   },
+   {
+    "id": "k5",
+    "chars": 142,
+    "codes": [
+     10
+    ],
+    "text": "The USB 3.2 Gen 1 port supports the USB 3.2 Gen 1 specification and is compatible to the USB 2.0\nspecification. Use this"
+   },
+   {
+    "id": "k6",
+    "chars": 142,
+    "codes": [
+     10
+    ],
+    "text": "The Gigabit Ethernet LAN port provides Internet connection at up to 1 Gbps data rate. The following\ndescribes the states"
+   },
+   {
+    "id": "k7",
+    "chars": 113,
+    "codes": [
+     10
+    ],
+    "text": "(Note 1) For AMD Ryzen ™ 5000 G-Series/4000 G-Series/3000 G-Series Processors only.\n(Note 2) Only for A520M K V2."
+   },
+   {
+    "id": "k9",
+    "chars": 141,
+    "codes": [
+     10
+    ],
+    "text": "When removing the cable connected to a back panel connector, first remove the cable from your\ndevice and then remove it "
+   },
+   {
+    "id": "k11",
+    "chars": 152,
+    "codes": [
+     10
+    ],
+    "text": "When removing the cable, pull it straight out from the connector. Do not rock it side to side to\nprevent an electrical s"
+   }
+  ]
+ },
+ "13": {
+  "mode": "inplace",
+  "ready_chars": 450,
+  "locked_with_letters": 290,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 153,
+    "codes": [
+     10
+    ],
+    "text": "You can change the functionality of an audio jack using the audio software. To configure\n7.1-channel audio, access the a"
+   },
+   {
+    "id": "k3",
+    "chars": 137,
+    "codes": [
+     10
+    ],
+    "text": "Please visit GIGABYTE's website for details on configuring the audio software.\nhttps://www.gigabyte.com/WebPage/697/real"
+   }
+  ]
+ },
+ "14": {
+  "mode": "inplace",
+  "ready_chars": 271,
+  "locked_with_letters": 313,
+  "locked": [
+   {
+    "id": "k32",
+    "chars": 159,
+    "codes": [
+     10
+    ],
+    "text": "Before installing the devices, be sure to turn off the devices and your computer. Unplug the power\ncord from the power o"
+   },
+   {
+    "id": "k34",
+    "chars": 154,
+    "codes": [
+     10
+    ],
+    "text": "After installing the device and before turning on the computer, make sure the device cable has\nbeen securely attached to"
+   }
+  ]
+ },
+ "15": {
+  "mode": "facing",
+  "ready_chars": 509,
+  "locked_with_letters": 779,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 516,
+    "codes": [
+     10
+    ],
+    "text": "With the use of the power connector, the power supply can supply enough stable power to all the components\non the mother"
+   },
+   {
+    "id": "k2",
+    "chars": 263,
+    "codes": [
+     10
+    ],
+    "text": "To meet expansion requirements, it is recommended that a power supply that can withstand high\npower consumption be used "
+   }
+  ]
+ },
+ "16": {
+  "mode": "facing",
+  "ready_chars": 498,
+  "locked_with_letters": 844,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 338,
+    "codes": [
+     10
+    ],
+    "text": "When connecting a fan cable, be sure to connect it in the correct orientation (the black connector wire\nis the ground wi"
+   },
+   {
+    "id": "k9",
+    "chars": 165,
+    "codes": [
+     10
+    ],
+    "text": "Be sure to connect fan cables to the fan headers to prevent your CPU and system from\noverheating. Overheating may result"
+   },
+   {
+    "id": "k11",
+    "chars": 341,
+    "codes": [
+     10
+    ],
+    "text": "The SATA connectors conform to SATA 6Gb/s standard and are compatible with SATA 3Gb/s and SATA\n1.5Gb/s standard. Each SA"
+   }
+  ]
+ },
+ "17": {
+  "mode": "facing",
+  "ready_chars": 231,
+  "locked_with_letters": 1026,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 25,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□S□□□□□□□S□□□□□□□□U□□□"
+   },
+   {
+    "id": "k2",
+    "chars": 18,
+    "codes": [
+     9633
+    ],
+    "text": "F_USB30 F_□U□□□□□□"
+   },
+   {
+    "id": "k3",
+    "chars": 12,
+    "codes": [
+     9633
+    ],
+    "text": "F_□ □□□□□□□□"
+   },
+   {
+    "id": "k4",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "F_□ □□□□"
+   },
+   {
+    "id": "k9",
+    "chars": 23,
+    "codes": [
+     9633
+    ],
+    "text": "B□□S□S□□□□□□□□□□□□□□□□□"
+   },
+   {
+    "id": "k10",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□B_□□□ □"
+   },
+   {
+    "id": "k14",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "□_S□ □□"
+   },
+   {
+    "id": "k16",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "B□□S_□□"
+   },
+   {
+    "id": "k18",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k19",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k22",
+    "chars": 20,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□S□□□□□□□□□□□□□□□"
+   },
+   {
+    "id": "k31",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "S□B_□□□"
+   },
+   {
+    "id": "k33",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k35",
+    "chars": 38,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□□□□□□□□□□□□□□□□□S□ □□ □□□□□□□□□□"
+   },
+   {
+    "id": "k36",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "S□□□□□□□"
+   },
+   {
+    "id": "k38",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "S□□□□"
+   },
+   {
+    "id": "k39",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□_□□□S"
+   },
+   {
+    "id": "k41",
+    "chars": 6,
+    "codes": [
+     9633
+    ],
+    "text": "□□S_□□"
+   },
+   {
+    "id": "k42",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "□□_S□"
+   },
+   {
+    "id": "k44",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k45",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "□□□_□□U"
+   },
+   {
+    "id": "k46",
+    "chars": 23,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□□□□□□□□□□□□□□U□□□"
+   },
+   {
+    "id": "k47",
+    "chars": 19,
+    "codes": [
+     9633
+    ],
+    "text": "B□□S□S□□□□□□□□□S□□□"
+   },
+   {
+    "id": "k49",
+    "chars": 40,
+    "codes": [
+     9633
+    ],
+    "text": "□ □□□□□□□□□□□□□□□□□□□□□□□□□□□□□S□□□□□□3□"
+   },
+   {
+    "id": "k50",
+    "chars": 9,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□□F□"
+   },
+   {
+    "id": "k51",
+    "chars": 6,
+    "codes": [
+     9633
+    ],
+    "text": "□□□_SB"
+   },
+   {
+    "id": "k53",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k54",
+    "chars": 20,
+    "codes": [
+     9633
+    ],
+    "text": "F_USB3□□F□□□□□□□□□□□"
+   },
+   {
+    "id": "k55",
+    "chars": 14,
+    "codes": [
+     9633
+    ],
+    "text": "S□ □□ _□□□□□□□"
+   },
+   {
+    "id": "k56",
+    "chars": 34,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□□□□□□□□□□□□□□□□□□□S□□□F□□□□□"
+   },
+   {
+    "id": "k60",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "S□□_□□□"
+   },
+   {
+    "id": "k61",
+    "chars": 12,
+    "codes": [
+     9633
+    ],
+    "text": "□□_□□□□□□_B□"
+   },
+   {
+    "id": "k62",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "□□_□□F□"
+   },
+   {
+    "id": "k64",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "□□B_□"
+   },
+   {
+    "id": "k65",
+    "chars": 10,
+    "codes": [
+     9633
+    ],
+    "text": "S□ □□ _S□□"
+   },
+   {
+    "id": "k68",
+    "chars": 23,
+    "codes": [
+     9633
+    ],
+    "text": "□□_□0□□□□□□□□□F□□□□□□□□"
+   },
+   {
+    "id": "k69",
+    "chars": 14,
+    "codes": [
+     9633
+    ],
+    "text": "S□ □□ _□□□□□□□"
+   },
+   {
+    "id": "k73",
+    "chars": 15,
+    "codes": [
+     9633
+    ],
+    "text": "S□□□F_□□□□□□□□□"
+   },
+   {
+    "id": "k74",
+    "chars": 14,
+    "codes": [
+     9633
+    ],
+    "text": "S□S_F □□□□B_□□"
+   },
+   {
+    "id": "k75",
+    "chars": 4,
+    "codes": [
+     9633
+    ],
+    "text": "B□ □"
+   },
+   {
+    "id": "k77",
+    "chars": 14,
+    "codes": [
+     9633
+    ],
+    "text": "S□ □□ _□□□□□□□"
+   },
+   {
+    "id": "k78",
+    "chars": 20,
+    "codes": [
+     9633
+    ],
+    "text": "□□_3□□□□□□□□□□□□□□U□"
+   },
+   {
+    "id": "k79",
+    "chars": 22,
+    "codes": [
+     9633
+    ],
+    "text": "□□□_□□□ F□ □□□□□□□□□□□"
+   },
+   {
+    "id": "k80",
+    "chars": 198,
+    "codes": [
+     10
+    ],
+    "text": "The M.2 connector supports M.2 SATA SSDs or M.2 PCIe SSDs and support RAID configuration. Please\nnote that an M.2 PCIe S"
+   },
+   {
+    "id": "k81",
+    "chars": 4,
+    "codes": [
+     9633
+    ],
+    "text": "F_□□"
+   },
+   {
+    "id": "k82",
+    "chars": 6,
+    "codes": [
+     9633
+    ],
+    "text": "F_□□□□"
+   },
+   {
+    "id": "k84",
+    "chars": 11,
+    "codes": [
+     9633
+    ],
+    "text": "F_USB30□3□□"
+   },
+   {
+    "id": "k85",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "F_USB3□□"
+   },
+   {
+    "id": "k86",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "□□B_□"
+   },
+   {
+    "id": "k87",
+    "chars": 3,
+    "codes": [
+     9633
+    ],
+    "text": "U□□"
+   },
+   {
+    "id": "k88",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "□□B_□"
+   },
+   {
+    "id": "k90",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "USB□0_□B"
+   },
+   {
+    "id": "k92",
+    "chars": 84,
+    "codes": [
+     10
+    ],
+    "text": "Follow the steps below to correctly install an M.2 SSD in the M.2 connector.\nStep 1:"
+   },
+   {
+    "id": "k93",
+    "chars": 110,
+    "codes": [
+     10
+    ],
+    "text": "Pull the clip's tab up and out of the mounting hole. Slide the M.2 SSD into the connector at an angle.\nStep 2:"
+   }
+  ]
+ },
+ "18": {
+  "mode": "inplace",
+  "ready_chars": 433,
+  "locked_with_letters": 1041,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 203,
+    "codes": [
+     10
+    ],
+    "text": "Connect the power switch, reset switch, and system status indicator on the chassis to this header according\nto the pin a"
+   },
+   {
+    "id": "k7",
+    "chars": 244,
+    "codes": [
+     10
+    ],
+    "text": "Connects to the power switch on the chassis front panel. You may configure the way to turn off your\nsystem using the pow"
+   },
+   {
+    "id": "k9",
+    "chars": 129,
+    "codes": [
+     10
+    ],
+    "text": "Connects to the hard drive activity LED on the chassis front panel. The LED is on when the hard drive\nis reading or writ"
+   },
+   {
+    "id": "k11",
+    "chars": 166,
+    "codes": [
+     10
+    ],
+    "text": "Connects to the reset switch on the chassis front panel. Press the reset switch to restart the computer\nif the computer "
+   },
+   {
+    "id": "k13",
+    "chars": 299,
+    "codes": [
+     10
+    ],
+    "text": "The front panel design may differ by chassis. A front panel module mainly consists of power\nswitch, reset switch, power "
+   }
+  ]
+ },
+ "19": {
+  "mode": "facing",
+  "ready_chars": 353,
+  "locked_with_letters": 685,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 301,
+    "codes": [
+     10
+    ],
+    "text": "The front panel audio header supports High Definition audio (HD). You may connect your chassis front\npanel audio module "
+   },
+   {
+    "id": "k16",
+    "chars": 187,
+    "codes": [
+     10
+    ],
+    "text": "Some chassis provide a front panel audio module that has separated connectors on each wire\ninstead of a single plug. For"
+   },
+   {
+    "id": "k17",
+    "chars": 197,
+    "codes": [
+     10
+    ],
+    "text": "Connects to the speaker on the chassis front panel. The system reports system startup status by issuing\na beep code. One"
+   }
+  ]
+ },
+ "20": {
+  "mode": "facing",
+  "ready_chars": 637,
+  "locked_with_letters": 845,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 210,
+    "codes": [
+     10
+    ],
+    "text": "The header conforms to USB 3.2 Gen 1 and USB 2.0 specification and can provide two USB ports. For\npurchasing the optiona"
+   },
+   {
+    "id": "k4",
+    "chars": 25,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□S□□□□□□□S□□□□□□□□U□□□"
+   },
+   {
+    "id": "k5",
+    "chars": 18,
+    "codes": [
+     9633
+    ],
+    "text": "F_USB30 F_□U□□□□□□"
+   },
+   {
+    "id": "k6",
+    "chars": 12,
+    "codes": [
+     9633
+    ],
+    "text": "F_□ □□□□□□□□"
+   },
+   {
+    "id": "k7",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "F_□ □□□□"
+   },
+   {
+    "id": "k24",
+    "chars": 23,
+    "codes": [
+     9633
+    ],
+    "text": "B□□S□S□□□□□□□□□□□□□□□□□"
+   },
+   {
+    "id": "k27",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□B_□□□ □"
+   },
+   {
+    "id": "k35",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "□_S□ □□"
+   },
+   {
+    "id": "k41",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "B□□S_□□"
+   },
+   {
+    "id": "k43",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k44",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k47",
+    "chars": 20,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□S□□□□□□□□□□□□□□□"
+   },
+   {
+    "id": "k56",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "S□B_□□□"
+   },
+   {
+    "id": "k58",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k60",
+    "chars": 38,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□□□□□□□□□□□□□□□□□S□ □□ □□□□□□□□□□"
+   },
+   {
+    "id": "k61",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "S□□□□□□□"
+   },
+   {
+    "id": "k63",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "S□□□□"
+   },
+   {
+    "id": "k66",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□_□□□S"
+   },
+   {
+    "id": "k70",
+    "chars": 6,
+    "codes": [
+     9633
+    ],
+    "text": "□□S_□□"
+   },
+   {
+    "id": "k71",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "□□_S□"
+   },
+   {
+    "id": "k73",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k76",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "□□□_□□U"
+   },
+   {
+    "id": "k79",
+    "chars": 23,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□□□□□□□□□□□□□□U□□□"
+   },
+   {
+    "id": "k81",
+    "chars": 60,
+    "codes": [
+     9633
+    ],
+    "text": "□ □□□□□□□□□□□□□□□□□□□□□□□□□□□□□S□□□□□□3□ B□□S□S□□□□□□□□□S□□□"
+   },
+   {
+    "id": "k82",
+    "chars": 9,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□□F□"
+   },
+   {
+    "id": "k83",
+    "chars": 6,
+    "codes": [
+     9633
+    ],
+    "text": "□□□_SB"
+   },
+   {
+    "id": "k87",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k92",
+    "chars": 20,
+    "codes": [
+     9633
+    ],
+    "text": "F_USB3□□F□□□□□□□□□□□"
+   },
+   {
+    "id": "k93",
+    "chars": 14,
+    "codes": [
+     9633
+    ],
+    "text": "S□ □□ _□□□□□□□"
+   },
+   {
+    "id": "k94",
+    "chars": 34,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□□□□□□□□□□□□□□□□□□□S□□□F□□□□□"
+   },
+   {
+    "id": "k98",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "S□□_□□□"
+   },
+   {
+    "id": "k99",
+    "chars": 12,
+    "codes": [
+     9633
+    ],
+    "text": "□□_□□□□□□_B□"
+   },
+   {
+    "id": "k100",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "□□_□□F□"
+   },
+   {
+    "id": "k102",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "□□B_□"
+   },
+   {
+    "id": "k103",
+    "chars": 10,
+    "codes": [
+     9633
+    ],
+    "text": "S□ □□ _S□□"
+   },
+   {
+    "id": "k107",
+    "chars": 23,
+    "codes": [
+     9633
+    ],
+    "text": "□□_□0□□□□□□□□□F□□□□□□□□"
+   },
+   {
+    "id": "k108",
+    "chars": 14,
+    "codes": [
+     9633
+    ],
+    "text": "S□ □□ _□□□□□□□"
+   },
+   {
+    "id": "k112",
+    "chars": 15,
+    "codes": [
+     9633
+    ],
+    "text": "S□□□F_□□□□□□□□□"
+   },
+   {
+    "id": "k113",
+    "chars": 14,
+    "codes": [
+     9633
+    ],
+    "text": "S□S_F □□□□B_□□"
+   },
+   {
+    "id": "k114",
+    "chars": 4,
+    "codes": [
+     9633
+    ],
+    "text": "B□ □"
+   },
+   {
+    "id": "k116",
+    "chars": 14,
+    "codes": [
+     9633
+    ],
+    "text": "S□ □□ _□□□□□□□"
+   },
+   {
+    "id": "k117",
+    "chars": 20,
+    "codes": [
+     9633
+    ],
+    "text": "□□_3□□□□□□□□□□□□□□U□"
+   },
+   {
+    "id": "k118",
+    "chars": 22,
+    "codes": [
+     9633
+    ],
+    "text": "□□□_□□□ F□ □□□□□□□□□□□"
+   },
+   {
+    "id": "k119",
+    "chars": 4,
+    "codes": [
+     9633
+    ],
+    "text": "F_□□"
+   },
+   {
+    "id": "k120",
+    "chars": 6,
+    "codes": [
+     9633
+    ],
+    "text": "F_□□□□"
+   },
+   {
+    "id": "k122",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "F_USB3□□"
+   },
+   {
+    "id": "k123",
+    "chars": 11,
+    "codes": [
+     9633
+    ],
+    "text": "F_USB30□3□□"
+   },
+   {
+    "id": "k124",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "□□B_□"
+   },
+   {
+    "id": "k125",
+    "chars": 3,
+    "codes": [
+     9633
+    ],
+    "text": "U□□"
+   },
+   {
+    "id": "k126",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "□□B_□"
+   },
+   {
+    "id": "k128",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "USB□0_□B"
+   }
+  ]
+ },
+ "21": {
+  "mode": "facing",
+  "ready_chars": 624,
+  "locked_with_letters": 1463,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "USB□0_□B"
+   },
+   {
+    "id": "k3",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "□□B_□"
+   },
+   {
+    "id": "k4",
+    "chars": 3,
+    "codes": [
+     9633
+    ],
+    "text": "U□□"
+   },
+   {
+    "id": "k5",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "□□B_□"
+   },
+   {
+    "id": "k6",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "F_USB3□□"
+   },
+   {
+    "id": "k7",
+    "chars": 11,
+    "codes": [
+     9633
+    ],
+    "text": "F_USB30□3□□"
+   },
+   {
+    "id": "k9",
+    "chars": 6,
+    "codes": [
+     9633
+    ],
+    "text": "F_□□□□"
+   },
+   {
+    "id": "k10",
+    "chars": 4,
+    "codes": [
+     9633
+    ],
+    "text": "F_□□"
+   },
+   {
+    "id": "k11",
+    "chars": 22,
+    "codes": [
+     9633
+    ],
+    "text": "□□□_□□□ F□ □□□□□□□□□□□"
+   },
+   {
+    "id": "k12",
+    "chars": 20,
+    "codes": [
+     9633
+    ],
+    "text": "□□_3□□□□□□□□□□□□□□U□"
+   },
+   {
+    "id": "k13",
+    "chars": 14,
+    "codes": [
+     9633
+    ],
+    "text": "S□ □□ _□□□□□□□"
+   },
+   {
+    "id": "k15",
+    "chars": 4,
+    "codes": [
+     9633
+    ],
+    "text": "B□ □"
+   },
+   {
+    "id": "k16",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "S□S_F □□"
+   },
+   {
+    "id": "k17",
+    "chars": 6,
+    "codes": [
+     9633
+    ],
+    "text": "□□B_□□"
+   },
+   {
+    "id": "k18",
+    "chars": 15,
+    "codes": [
+     9633
+    ],
+    "text": "S□□□F_□□□□□□□□□"
+   },
+   {
+    "id": "k22",
+    "chars": 14,
+    "codes": [
+     9633
+    ],
+    "text": "S□ □□ _□□□□□□□"
+   },
+   {
+    "id": "k23",
+    "chars": 23,
+    "codes": [
+     9633
+    ],
+    "text": "□□_□0□□□□□□□□□F□□□□□□□□"
+   },
+   {
+    "id": "k30",
+    "chars": 10,
+    "codes": [
+     9633
+    ],
+    "text": "S□ □□ _S□□"
+   },
+   {
+    "id": "k31",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "□□B_□"
+   },
+   {
+    "id": "k33",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "□□_□□F□"
+   },
+   {
+    "id": "k34",
+    "chars": 12,
+    "codes": [
+     9633
+    ],
+    "text": "□□_□□□□□□_B□"
+   },
+   {
+    "id": "k35",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "S□□_□□□"
+   },
+   {
+    "id": "k47",
+    "chars": 34,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□□□□□□□□□□□□□□□□□□□S□□□F□□□□□"
+   },
+   {
+    "id": "k48",
+    "chars": 14,
+    "codes": [
+     9633
+    ],
+    "text": "S□ □□ _□□□□□□□"
+   },
+   {
+    "id": "k53",
+    "chars": 20,
+    "codes": [
+     9633
+    ],
+    "text": "F_USB3□□F□□□□□□□□□□□"
+   },
+   {
+    "id": "k54",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k56",
+    "chars": 9,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□□F□"
+   },
+   {
+    "id": "k57",
+    "chars": 6,
+    "codes": [
+     9633
+    ],
+    "text": "□□□_SB"
+   },
+   {
+    "id": "k58",
+    "chars": 40,
+    "codes": [
+     9633
+    ],
+    "text": "□ □□□□□□□□□□□□□□□□□□□□□□□□□□□□□S□□□□□□3□"
+   },
+   {
+    "id": "k60",
+    "chars": 19,
+    "codes": [
+     9633
+    ],
+    "text": "B□□S□S□□□□□□□□□S□□□"
+   },
+   {
+    "id": "k61",
+    "chars": 23,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□□□□□□□□□□□□□□U□□□"
+   },
+   {
+    "id": "k62",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "□□□_□□U"
+   },
+   {
+    "id": "k63",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k65",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "□□_S□"
+   },
+   {
+    "id": "k66",
+    "chars": 6,
+    "codes": [
+     9633
+    ],
+    "text": "□□S_□□"
+   },
+   {
+    "id": "k67",
+    "chars": 282,
+    "codes": [
+     10,
+     9633
+    ],
+    "text": "The battery provides power to keep the values (such as BIOS configurations, date, and time information) □□\nin the CMOS w"
+   },
+   {
+    "id": "k68",
+    "chars": 5,
+    "codes": [
+     9633
+    ],
+    "text": "S□□□□"
+   },
+   {
+    "id": "k70",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "S□□□□□□□"
+   },
+   {
+    "id": "k71",
+    "chars": 38,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□□□□□□□□□□□□□□□□□S□ □□ □□□□□□□□□□"
+   },
+   {
+    "id": "k73",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k75",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "S□B_□□□"
+   },
+   {
+    "id": "k84",
+    "chars": 20,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□S□□□□□□□□□□□□□□□"
+   },
+   {
+    "id": "k87",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k88",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□□□B□"
+   },
+   {
+    "id": "k91",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "B□□S_□□"
+   },
+   {
+    "id": "k93",
+    "chars": 138,
+    "codes": [
+     10
+    ],
+    "text": "Gently remove the battery from the battery holder and wait for one\nminute. (Or use a metal object like a screwdriver to "
+   },
+   {
+    "id": "k95",
+    "chars": 7,
+    "codes": [
+     9633
+    ],
+    "text": "□_S□ □□"
+   },
+   {
+    "id": "k100",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "□B_□□□ □"
+   },
+   {
+    "id": "k102",
+    "chars": 23,
+    "codes": [
+     9633
+    ],
+    "text": "B□□S□S□□□□□□□□□□□□□□□□□"
+   },
+   {
+    "id": "k105",
+    "chars": 128,
+    "codes": [
+     10
+    ],
+    "text": "Replace the battery with an equivalent one. Damage to your devices may occur if the battery is\nreplaced with an incorrec"
+   },
+   {
+    "id": "k107",
+    "chars": 138,
+    "codes": [
+     10
+    ],
+    "text": "Contact the place of purchase or local dealer if you are not able to replace the battery by yourself\nor uncertain about "
+   },
+   {
+    "id": "k109",
+    "chars": 151,
+    "codes": [
+     10
+    ],
+    "text": "When installing the battery, note the orientation of the positive side (+) and the negative side (-)\nof the battery (the"
+   },
+   {
+    "id": "k115",
+    "chars": 12,
+    "codes": [
+     9633
+    ],
+    "text": "F_□ □□□□□□□□"
+   },
+   {
+    "id": "k116",
+    "chars": 8,
+    "codes": [
+     9633
+    ],
+    "text": "F_□ □□□□"
+   },
+   {
+    "id": "k117",
+    "chars": 18,
+    "codes": [
+     9633
+    ],
+    "text": "F_USB30 F_□U□□□□□□"
+   },
+   {
+    "id": "k119",
+    "chars": 25,
+    "codes": [
+     9633
+    ],
+    "text": "□□□□S□□□□□□□S□□□□□□□□U□□□"
+   }
+  ]
+ },
+ "22": {
+  "mode": "inplace",
+  "ready_chars": 189,
+  "locked_with_letters": 601,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 179,
+    "codes": [
+     10
+    ],
+    "text": "This motherboard provides a chassis detection feature that detects if the chassis cover has been removed.\nThis function "
+   },
+   {
+    "id": "k5",
+    "chars": 199,
+    "codes": [
+     10
+    ],
+    "text": "Use this jumper to clear the BIOS configuration and reset the CMOS values to factory defaults. To clear\nthe CMOS values,"
+   },
+   {
+    "id": "k8",
+    "chars": 223,
+    "codes": [
+     10
+    ],
+    "text": "After system restart, go to BIOS Setup to load factory defaults (select Load Optimized Defaults) or\nmanually configure t"
+   }
+  ]
+ },
+ "23": {
+  "mode": "inplace",
+  "ready_chars": 299,
+  "locked_with_letters": 1726,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 404,
+    "codes": [
+     10
+    ],
+    "text": "BIOS (Basic Input and Output System) records hardware parameters of the system in the CMOS on the\nmotherboard. Its major"
+   },
+   {
+    "id": "k2",
+    "chars": 147,
+    "codes": [
+     10
+    ],
+    "text": "When the power is turned off, the battery on the motherboard supplies the necessary power to the CMOS to\nkeep the config"
+   },
+   {
+    "id": "k5",
+    "chars": 127,
+    "codes": [
+     10
+    ],
+    "text": "@BIOS is a Windows-based utility that searches and downloads the latest version of BIOS from the Internet\nand updates th"
+   },
+   {
+    "id": "k6",
+    "chars": 166,
+    "codes": [
+     10
+    ],
+    "text": "For instructions on using the Q-Flash and @BIOS utilities, please navigate to the \"Unique Features\" page of\nGIGABYTE's w"
+   },
+   {
+    "id": "k8",
+    "chars": 256,
+    "codes": [
+     10
+    ],
+    "text": "Because BIOS flashing is potentially risky, if you do not encounter problems using the current\nversion of BIOS, it is re"
+   },
+   {
+    "id": "k10",
+    "chars": 296,
+    "codes": [
+     10
+    ],
+    "text": "It is recommended that you not alter the default settings (unless you need to) to prevent system\ninstability or other un"
+   },
+   {
+    "id": "k12",
+    "chars": 206,
+    "codes": [
+     10
+    ],
+    "text": "Refer to the introductions of the battery/clear CMOS jumper in Chapter 2 or navigate to the \"BIOS\nSetup\" page of GIGABYT"
+   },
+   {
+    "id": "k14",
+    "chars": 124,
+    "codes": [
+     10
+    ],
+    "text": "Please visit GIGABYTE's website for details on configuring BIOS Setup.\nhttps://www.gigabyte.com/WebPage/954/amd500-bios."
+   }
+  ]
+ },
+ "24": {
+  "mode": "inplace",
+  "ready_chars": 357,
+  "locked_with_letters": 407,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 407,
+    "codes": [
+     10
+    ],
+    "text": "Boot Menu allows you to set the first boot device without entering BIOS Setup. In Boot Menu, use the up\narrow key <h> or"
+   }
+  ]
+ },
+ "25": {
+  "mode": "inplace",
+  "ready_chars": 185,
+  "locked_with_letters": 1088,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 470,
+    "codes": [
+     10
+    ],
+    "text": "As some operating systems already include RAID driver, you do not need to install separate RAID driver\nduring the Window"
+   },
+   {
+    "id": "k2",
+    "chars": 218,
+    "codes": [
+     10
+    ],
+    "text": "Go to GIGABYTE's website, browse to the motherboard model's web page, download the AMD RAID Preinstall\nDriver file on th"
+   },
+   {
+    "id": "k3",
+    "chars": 150,
+    "codes": [
+     10
+    ],
+    "text": "Boot from the Windows setup disc and perform standard OS installation steps. When the screen requesting you\nto load the "
+   },
+   {
+    "id": "k4",
+    "chars": 250,
+    "codes": [
+     10
+    ],
+    "text": "Insert the USB thumb drive and then browse to the location of the driver. Select AMD-RAID Bottom Device first\nand click "
+   }
+  ]
+ },
+ "26": {
+  "mode": "facing",
+  "ready_chars": 276,
+  "locked_with_letters": 642,
+  "locked": [
+   {
+    "id": "k1",
+    "chars": 209,
+    "codes": [
+     10
+    ],
+    "text": "After you install the operating system, a dialog box will appear on the bottom-right corner of the desktop asking\nif you"
+   },
+   {
+    "id": "k2",
+    "chars": 194,
+    "codes": [
+     10
+    ],
+    "text": "When the End User License Agreement dialog box appears, press <Accept> to install APP Center. On the APP\nCenter screen, "
+   },
+   {
+    "id": "k4",
+    "chars": 124,
+    "codes": [
+     10
+    ],
+    "text": "Please visit GIGABYTE's website for more software information.\nhttps://www.gigabyte.com/WebPage/320/am4-app-center.html?"
+   },
+   {
+    "id": "k6",
+    "chars": 115,
+    "codes": [
+     10
+    ],
+    "text": "Please visit GIGABYTE's website for more troubleshooting information.\nhttps://www.gigabyte.com/WebPage/351/faq.html"
+   }
+  ]
+ },
+ "27": {
+  "mode": "facing",
+  "ready_chars": 463,
+  "locked_with_letters": 427,
+  "locked": [
+   {
+    "id": "k4",
+    "chars": 161,
+    "codes": [
+     10
+    ],
+    "text": "This motherboard supports RAID 0, RAID 1, and RAID 10. Prepare the correct number of hard drives as indicated\nin the tab"
+   },
+   {
+    "id": "k6",
+    "chars": 138,
+    "codes": [
+     10
+    ],
+    "text": "SATA hard drives or SSDs. To ensure optimal performance, it is recommended that you use two hard drives\nwith identical m"
+   },
+   {
+    "id": "k11",
+    "chars": 128,
+    "codes": [
+     10
+    ],
+    "text": "Please visit GIGABYTE's website for details on configuring a RAID array.\nhttps://www.gigabyte.com/WebPage/313/am4-raid.h"
+   }
+  ]
+ },
+ "28": {
+  "mode": "kept",
+  "ready_chars": 0,
+  "locked_with_letters": 0,
+  "locked": []
+ },
+ "29": {
+  "mode": "inplace",
+  "ready_chars": 338,
+  "locked_with_letters": 112,
+  "locked": [
+   {
+    "id": "k2",
+    "chars": 112,
+    "codes": [
+     10
+    ],
+    "text": "To submit a technical or non-technical (Sales/Marketing) question, please link to:\nhttps://esupport.gigabyte.com"
+   }
+  ]
+ }
+}
