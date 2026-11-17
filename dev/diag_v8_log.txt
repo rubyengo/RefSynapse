@@ -1,0 +1,31 @@
+finished field -> 'D:\\vibecoding\\RefSynapse\\agent\\mk-740_742_manual_no_ru_ru.pdf'
+file D:\vibecoding\RefSynapse\agent\mk-740_742_manual_no_ru_ru.pdf  966663 bytes  2026-11-17 00:44
+file agent\mk-740_742_manual_no_ru_ru.pdf  966663 bytes  2026-11-17 00:44
+file agent\mk-740_742_manual_no_ru_ru_v8.pdf  MISSING
+CHECKING -> D:\vibecoding\RefSynapse\agent\mk-740_742_manual_no_ru_ru.pdf
+pages 6 modes {'1': 'facing', '2': 'facing', '3': 'facing', '4': 'facing', '5': 'facing', '6': 'facing'}
+== page 1 mode=facing status=done changed=2 same=3 wording_gone=True
+  smallest fitted font 8.00 pt
+== page 2 mode=facing status=done changed=36 same=0 wording_gone=True
+  CLASH t12 into t13 bottom=228.0 top=231.2
+  CLASH t15 into k5 bottom=200.2 top=206.0
+  smallest fitted font 4.00 pt
+== page 3 mode=facing status=done changed=29 same=8 wording_gone=True
+  smallest fitted font 4.30 pt
+== page 4 mode=facing status=done changed=25 same=0 wording_gone=False
+  SURVIVED t6 'ConnectthemicrophoneandreceivertotheUSBportofyourPCorUSBchar'
+  SURVIVED t8 'Thebatteryisusedasanintegralpartoftheequipment,sodonotattemp'
+  SURVIVED t13 'Turnonthereceiverbylongpressingthebuttonc.Thegreenindicatorw'
+  SURVIVED t14 'Connectthereceivertothe6.3mmjackconnectorofthespeakersystem,'
+  SURVIVED t16 'Adjusttherequiredvolumeusingbuttonsdande.'
+  SURVIVED t19 'Turnonthemicrophone.Thegreenindicatoronthemicrophonewillflas'
+  SURVIVED t20 'Turnonthereceiver.Theyellow(yellowand/orbluefortheMK-742mode'
+  SURVIVED t22 'Quicklypressthepowerbuttonc10timesonthereceiver.'
+  SURVIVED t23 'Quicklypressthepowerbuttona10timesonthemicrophone.'
+  SURVIVED t24 'Afterthis,themicrophoneandreceiverwillbepaired.Theindicatoro'
+  smallest fitted font 4.00 pt
+== page 5 mode=facing status=done changed=21 same=0 wording_gone=True
+  smallest fitted font 5.05 pt
+== page 6 mode=facing status=done changed=8 same=9 wording_gone=True
+  smallest fitted font 5.05 pt
+SUMMARY bad_wording=[4] clashes=2
