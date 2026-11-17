@@ -1,0 +1,680 @@
+----- 297-325 -----
+297 def _resolve(obj):
+298     return obj.get_object() if isinstance(obj, IndirectObject) else obj
+299 
+300 
+301 def _mat_mul(a, b):
+302     return [a[0] * b[0] + a[1] * b[2],
+303             a[0] * b[1] + a[1] * b[3],
+304             a[2] * b[0] + a[3] * b[2],
+305             a[2] * b[1] + a[3] * b[3],
+306             a[4] * b[0] + a[5] * b[2] + b[4],
+307             a[4] * b[1] + a[5] * b[3] + b[5]]
+308 
+309 
+310 def _rect_of(block):
+311     return (block["x0"] - 1.5,
+312             block["y_bot"] - 2.0,
+313             float(block.get("x_room", block["x1"])) + 1.5,
+314             block["first_y"] + 0.85 * block["size"])
+315 
+316 
+317 def _in_rect(rect, x, y):
+318     return rect[0] <= x <= rect[2] and rect[1] <= y <= rect[3]
+319 
+320 
+321 def _norm(text):
+322     return re.sub(r"\s", "", text or "")
+323 
+324 
+325 # ------------------------------------------- containers (form XObjects), v7
+----- 370-496 -----
+370 def _hex_of(values):
+371     out = [max(0, min(255, int(round(255.0 * float(v))))) for v in values]
+372     return "#%02x%02x%02x" % (out[0], out[1], out[2])
+373 
+374 
+375 def _cmyk_hex(c, m, y, k):
+376     return _hex_of([(1 - c) * (1 - k), (1 - m) * (1 - k), (1 - y) * (1 - k)])
+377 
+378 
+379 def _replay(operations, ctm, fill, res, pdf, writer, mode,
+380           trans_rects, lock_rects, samples, depth=0, seen=None):
+381     """Replay drawing commands, walking INTO form containers.
+382     mode 'surgical': drop show commands inside translated rects (locked
+383     rects win); mode 'all': drop every show command; mode 'colors': keep
+384     everything and record (x, y, fill) of every show command.
+385     v8: deeper recursion (16); the cycle guard is per-branch, so a form
+386     used several times is rewritten at every placement, not only the
+387     first one.
+388     """
+389     if seen is None:
+390         seen = set()
+391     ident = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+392     tm, tlm = ident[:], ident[:]
+393     stack = []
+394     leading, rise = 0.0, 0.0
+395     kept = []
+396     for operands, op in operations:
+397         try:
+398             if op == b"q":
+399                 stack.append((ctm[:], fill))
+400             elif op == b"Q":
+401                 if stack:
+402                     ctm, fill = stack.pop()
+403             elif op == b"cm":
+404                 ctm = _mat_mul([float(v) for v in operands], ctm)
+405             elif op == b"g":
+406                 fill = _hex_of([float(operands[0])] * 3)
+407             elif op == b"rg":
+408                 fill = _hex_of([float(v) for v in operands[:3]])
+409             elif op == b"k":
+410                 fill = _cmyk_hex(*[float(v) for v in operands[:4]])
+411             elif op in (b"sc", b"scn"):
+412                 vals = []
+413                 for v in operands:
+414                     try:
+415                         vals.append(float(v))
+416                     except Exception:
+417                         vals = []
+418                         break
+419                 if len(vals) == 1:
+420                     fill = _hex_of(vals * 3)
+421                 elif len(vals) == 3:
+422                     fill = _hex_of(vals)
+423                 elif len(vals) == 4:
+424                     fill = _cmyk_hex(*vals)
+425             elif op == b"BT":
+426                 tm, tlm = ident[:], ident[:]
+427             elif op == b"Tm":
+428                 tm = tlm = [float(v) for v in operands]
+429             elif op in (b"Td", b"TD"):
+430                 tx, ty = float(operands[0]), float(operands[1])
+431                 if op == b"TD":
+432                     leading = -ty
+433                 tlm = _mat_mul([1, 0, 0, 1, tx, ty], tlm)
+434                 tm = tlm[:]
+435             elif op == b"T*":
+436                 tlm = _mat_mul([1, 0, 0, 1, 0, -leading], tlm)
+437                 tm = tlm[:]
+438             elif op == b"TL":
+439                 leading = float(operands[0])
+440             elif op == b"Ts":
+441                 rise = float(operands[0])
+442             elif op == b"Do" and depth < 16:
+443                 name = str(operands[0])
+444                 xo = _resolve(res.get("/XObject")) or {}
+445                 form = _resolve(xo.get(name))
+446                 walk = False
+447                 try:
+448                     walk = (form is not None
+449                             and form.get("/Subtype") == "/Form")
+450                 except Exception:
+451                     walk = False
+452                 fid = id(form)
+453                 if walk and fid in seen:
+454                     walk = False
+455                 elif walk and mode == "colors":
+456                     seen.add(fid)
+457                 if walk:
+458                     try:
+459                         if writer is not None and mode != "colors":
+460                             child_res = _private_resources(form, writer)
+461                             child_seen = seen | {fid}
+462                         else:
+463                             child_res = (_resolve(form.get("/Resources"))
+464                                          or res)
+465                             child_seen = (seen if mode == "colors"
+466                                           else seen | {fid})
+467                         inner = ContentStream(form, pdf).operations
+468                         kept_child = _replay(inner, ctm[:], fill,
+469                                              child_res, pdf, writer, mode,
+470                                              trans_rects, lock_rects,
+471                                              samples, depth + 1, child_seen)
+472                         if writer is not None and mode != "colors":
+473                             cs = ContentStream(None, pdf)
+474                             cs.operations = kept_child
+475                             form.set_data(cs.get_data())
+476                     except Exception:
+477                         pass
+478             elif op in SHOW_OPS:
+479                 if op in (b"'", b'"'):
+480                     tlm = _mat_mul([1, 0, 0, 1, 0, -leading], tlm)
+481                     tm = tlm[:]
+482                 device = _mat_mul(tm, ctm)
+483                 x, y = device[4], device[5] + rise * ctm[3]
+484                 if mode == "colors":
+485                     samples.append((x, y, fill))
+486                 elif mode == "all":
+487                     continue
+488                 elif any(_in_rect(r, x, y) for r in lock_rects):
+489                     pass
+490                 elif any(_in_rect(r, x, y) for r in trans_rects):
+491                     continue
+492         except Exception:
+493             pass
+494         kept.append((operands, op))
+495     return kept
+496 
+----- 595-708 -----
+595 def _wording_gone(page, blocks, forbidden):
+596     try:
+597         after = _norm(page.extract_text() or "")
+598     except Exception:
+599         return False
+600     for block in blocks:
+601         for needle in _block_needles(block, forbidden):
+602             if needle in after:
+603                 return False
+604     return True
+605 
+606 
+607 def _lock_rect_of(block):
+608     """Protection area of kept wording: its OWN ink, never the room it
+609     could grow into (x_room). An inflated bullet rect used to shield the
+610     first show command of the neighbouring translated line.
+611     """
+612     return (block["x0"] - 1.0,
+613             block["y_bot"] - 1.0,
+614             block["x1"] + 1.0,
+615             block["first_y"] + 0.85 * block["size"])
+616 
+617 
+618 def _marker_locked(block):
+619     """True for a pure list marker (bullet, dash). It is redrawn with the
+620     wording when a page had to be cleaned fully, so lists keep bullets.
+621     """
+622     text = str(block.get("text", "")).strip()
+623     if not text or len(text) > 3:
+624         return False
+625     return all(ch in BULLET_STARTS or ch in ".)]" for ch in text)
+626 
+627 
+628 def _surgical_strip(writer, index, trans_blocks, locked_blocks):
+629     """Remove ONLY the translated wording, on the page and inside forms.
+630     The returned flag is a first reading only - the caller re-checks on
+631     a saved and re-read file, which is the one that must be honest.
+632     """
+633     page = writer.pages[index]
+634     contents = page.get_contents()
+635     if contents is None:
+636         return False
+637     forbidden = [_norm(b.get("text", "")) for b in locked_blocks]
+638     trans_rects = [_rect_of(b) for b in trans_blocks]
+639     lock_rects = [_lock_rect_of(b) for b in locked_blocks]
+640     try:
+641         res = _private_resources(page, writer)
+642         stream = ContentStream(contents, writer)
+643     except Exception:
+644         return False
+645     kept = _replay(stream.operations, [1, 0, 0, 1, 0, 0], "#000000", res,
+646                    writer, writer, "surgical", trans_rects, lock_rects, [])
+647     try:
+648         _set_contents(page, writer, kept)
+649     except Exception:
+650         return False
+651     return _wording_gone(page, trans_blocks, forbidden)
+652 
+653 def _text_colors(page):
+654     """(x, y, '#rrggbb') of every show command, page AND containers."""
+655     try:
+656         contents = page.get_contents()
+657         if contents is None:
+658             return []
+659         stream = ContentStream(contents, page.pdf)
+660         res = _resolve(page.get("/Resources")) or {}
+661     except Exception:
+662         return []
+663     samples = []
+664     _replay(stream.operations, [1, 0, 0, 1, 0, 0], "#000000", res, page.pdf,
+665             None, "colors", [], [], samples)
+666     return samples
+667 
+668 
+669 def _block_color(block, samples):
+670     rect = _rect_of(block)
+671     hits = [c for x, y, c in samples if _in_rect(rect, x, y)]
+672     if not hits:
+673         return "#000000"
+674     return max(set(hits), key=hits.count)
+675 
+676 
+677 def _expanded_block(block, all_blocks):
+678     """Room for the translation: stop a small gap ABOVE the neighbour
+679     below, and never grow sideways into ink sitting on the same rows
+680     (a dash or a marker at the right edge used to be overrun).
+681     """
+682     top = block["first_y"] + 0.75 * block["size"]
+683     bottom = block["y_bot"]
+684     right0 = float(block.get("x_room", block["x1"]))
+685     right = right0
+686     below = []
+687     for other in all_blocks:
+688         if other is block:
+689             continue
+690         o_top = other["first_y"] + 0.75 * other["size"]
+691         o_bot = other["y_bot"]
+692         if o_top < top - 1.0 and other["x0"] < right0 \
+693            and block["x0"] < other.get("x_room", other["x1"]):
+694             below.append(other)
+695         if other["x0"] >= block["x1"] - 0.5 \
+696            and o_bot <= top and o_top >= bottom:
+697             right = min(right, other["x0"] - 1.0)
+698     neighbour = max(below, key=lambda o: o["first_y"]) if below else None
+699     room = (neighbour["first_y"] + 0.75 * neighbour["size"] + MIRROR_GAP) \
+700         if neighbour else 24.0
+701     out = dict(block)
+702     out["y_bot"] = min(bottom, room)
+703     out["x_room"] = round(max(block["x1"], right), 2)
+704     return out
+705 
+706 _METRICS = {}
+707 
+708 
+----- 792-848 -----
+792 def _page_spans(page):
+793     spans = []
+794 
+795     def visitor(text, cm, tm, font_dict, font_size):
+796         if not text or not text.strip():
+797             return
+798         try:
+799             a, b, c, d, e, f = [float(v) for v in cm]
+800             g, h, i, j, k, l = [float(v) for v in tm]
+801         except Exception:
+802             return
+803         scale_y = (g * b + h * d) or (i * b + j * d) or 1.0
+804         size = abs(float(font_size) * scale_y) or abs(float(font_size)) or 9.0
+805         if size < 2.0:
+806             return
+807         x = k * a + l * c + e
+808         y = k * b + l * d + f
+809         name = ""
+810         try:
+811             name = str((font_dict or {}).get("/BaseFont", ""))
+812         except Exception:
+813             pass
+814         clean = text.replace("\n", " ").replace("\r", " ")
+815         spans.append({"text": clean,
+816                       "x": float(x), "y": float(y), "size": float(size),
+817                       "w": _span_width(font_dict, float(size), clean),
+818                       "font": name})
+819 
+820     try:
+821         whole = page.extract_text(visitor_text=visitor) or ""
+822     except Exception:
+823         return []
+824     if spans:
+825         wanted = len(re.sub(r"\s", "", whole))
+826         got = sum(len(re.sub(r"\s", "", s["text"])) for s in spans)
+827         if wanted and got < 0.85 * wanted:
+828             raise ToolError("too hard to measure (only %d%% of its text was "
+829                             "located)" % int(100.0 * got / wanted))
+830     return spans
+831 
+832 
+833 def _style(font_name):
+834     name = str(font_name).lower()
+835     bold = any(t in name for t in ("bold", "black", "heavy", "semibold"))
+836     italic = "italic" in name or "oblique" in name
+837     return bold, italic
+838 
+839 
+840 def _serif_name(font_name):
+841     name = str(font_name).lower()
+842     if "sans" in name:
+843         return False
+844     return any(t in name for t in ("times", "serif", "georgia", "cambria",
+845                                    "garamond", "palatino", "minion",
+846                                    "century", "book antiqua"))
+847 
+848 
+----- 1043-1084 -----
+1043 def _fit_block(block, text, font, min_scale, floor_abs=5.0, tight=False):
+1044     """Word wrap into the rectangle; the mirror fitting ladder.
+1045     Returns (lines, size, overflow, leading, hscale). Ladder: shrink to
+1046     min_scale, tighten leading to 1.0, shrink to floor_abs, then squeeze
+1047     horizontally. In tight (mirror) mode hard line breaks are reflowed -
+1048     the rectangle matters, not where the model pressed Enter - and the
+1049     last line's descender must stay at or above y_bot.
+1050     """
+1051     text = str(text)
+1052     if tight:
+1053         text = re.sub(r"\s+", " ", text).strip()
+1054     right = float(block.get("x_room", block["x1"]))
+1055     width = max(right - block["x0"] + 2.0, 8.0)
+1056     size0 = block["size"]
+1057     soft = max(floor_abs, size0 * min_scale)
+1058     hard = floor_abs if tight else soft
+1059     size = size0
+1060     lead = float(block["leading"])
+1061     hscale = 100
+1062     slack = 0.0 if tight else 1.5
+1063     while True:
+1064         lines = _wrap(text, font, size, width * 100.0 / hscale)
+1065         step = size * lead
+1066         bottom = block["first_y"] - (len(lines) - 1) * step - 0.30 * size
+1067         overflow = bottom < block["y_bot"] - slack
+1068         if not overflow:
+1069             return lines, size, False, lead, hscale
+1070         if size > soft + 1e-6:
+1071             size = max(soft, size - 0.25)
+1072             continue
+1073         if tight and lead > 1.0 + 1e-6:
+1074             lead = max(1.0, lead - 0.05)
+1075             continue
+1076         if size > hard + 1e-6:
+1077             size = max(hard, size - 0.25)
+1078             continue
+1079         if tight and hscale > MIRROR_SQUEEZE[-1]:
+1080             hscale = MIRROR_SQUEEZE[MIRROR_SQUEEZE.index(hscale) + 1]
+1081             continue
+1082         return lines, size, True, lead, hscale
+1083 
+1084 # ----------------------------------------------------------------- rendering
+----- 1133-1437 -----
+1133 def _facing_pages(job, key, number, width, height):
+1134     import io
+1135     from pypdf import PdfReader
+1136     from reportlab.pdfgen import canvas
+1137     items = list(job["blocks"].get(key, []))
+1138     for block in job["locked"].get(key, []):
+1139         if _readable_locked(block):
+1140             items.append(block)
+1141     items.sort(key=lambda b: (-b["first_y"], b["x0"]))
+1142     trans = job["translations"].get(key, {})
+1143     base_font = _font_name()
+1144     margin = 36.0
+1145     usable = max(width - 2 * margin, 60.0)
+1146     buffer = io.BytesIO()
+1147     doc = canvas.Canvas(buffer, pagesize=(width, height))
+1148     doc.setFillColor(HexColor("#000000"))
+1149     doc.setFont(base_font, 9)
+1150     doc.drawString(margin, height - margin - 9,
+1151                    "Страница %d — перевод" % number)
+1152     y = height - margin - 26
+1153     for block in items:
+1154         text = trans.get(block["id"], block["text"])
+1155         if _bad_glyphs(text):
+1156             text = "".join(" " if _junk(ch) else ch for ch in text)
+1157             text = re.sub(r"[ \t]+", " ", text).strip()
+1158         if not text:
+1159             continue
+1160         face = _block_font(block)
+1161         size = min(max(float(block["size"]), 7.0), 12.0)
+1162         step = size * 1.3
+1163         for line in _wrap(text, face, size, usable):
+1164             if y - size < margin:
+1165                 doc.showPage()
+1166                 y = height - margin
+1167             doc.setFillColor(HexColor(block.get("color") or "#000000"))
+1168             doc.setFont(face, size)
+1169             if line:
+1170                 doc.drawString(margin, y - size, line)
+1171             y -= step
+1172         y -= 4
+1173     doc.showPage()
+1174     doc.save()
+1175     buffer.seek(0)
+1176     return list(PdfReader(buffer).pages)
+1177 
+1178 
+1179 def _draw_blocks(doc, blocks, trans, all_blocks, page_over, key,
+1180                  min_scale, floor_abs, tight, expand):
+1181     smallest = 99.0
+1182     for block in blocks:
+1183         text = trans.get(block["id"], block["text"])
+1184         font = _block_font(block)
+1185         target = _expanded_block(block, all_blocks) if expand else block
+1186         lines, size, over, lead, hscale = _fit_block(
+1187             target, text, font, min_scale, floor_abs=floor_abs, tight=tight)
+1188         smallest = min(smallest, size)
+1189         if over:
+1190             page_over.append({"page": int(key), "id": block["id"],
+1191                               "font_size": round(size, 2),
+1192                               "hscale": hscale})
+1193         doc.setFillColor(HexColor(block.get("color") or "#000000"))
+1194         y = block["first_y"]
+1195         for line in lines:
+1196             if line:
+1197                 to = doc.beginText(block["x0"], y)
+1198                 to.setFont(font, size)
+1199                 if hscale != 100:
+1200                     to.setHorizScale(hscale)
+1201                 to.textOut(line)
+1202                 doc.drawText(to)
+1203             y -= size * lead
+1204     return smallest
+1205 
+1206 
+1207 def _render(job, folder, target, partial_ok, meta_title=None, custom=None,
+1208             facing_style="mirror"):
+1209     """Rebuild the result. Mirror NEVER changes the page count.
+1210     Every check runs on a saved and re-read file. Stages per page:
+1211     surgical lift-out -> verify -> full strip and redraw -> verify ->
+1212     original page shipped untouched and reported. The finished document
+1213     is audited once more and repaired once if any wording survived.
+1214     """
+1215     import io
+1216     from pypdf import PdfReader
+1217     src = _reader(job["source"])
+1218     base = _reader(os.path.join(folder, "base.pdf"))
+1219     mirror = facing_style == "mirror"
+1220     overflow, facing, mapping = [], [], {}
+1221     mirrored, fallback, redrawn, unplaced = [], [], [], []
+1222     leftovers = []
+1223     min_font = [99.0]
+1224     min_scale = float(job.get("min_scale", 0.7))
+1225 
+1226     plan = {}
+1227     for index in range(job["pages_total"]):
+1228         key = str(index + 1)
+1229         mode = job["mode"].get(key, "kept")
+1230         ready = job["status"].get(key) == "done"
+1231         trans = job["translations"].get(key, {})
+1232         t_blocks = job["blocks"].get(key, [])
+1233         k_blocks = job["locked"].get(key, [])
+1234         all_blocks = t_blocks + k_blocks
+1235         if ready:
+1236             samples = _text_colors(src.pages[index])
+1237             for block in all_blocks:
+1238                 block["color"] = _block_color(block, samples)
+1239         changed, same = [], []
+1240         for block in t_blocks:
+1241             now = trans.get(block["id"], block["text"])
+1242             if _norm(now) == _norm(block["text"]):
+1243                 same.append(block)
+1244             else:
+1245                 changed.append(block)
+1246         entry = {"key": key, "mode": mode, "ready": ready, "trans": trans,
+1247                  "all": all_blocks, "changed": changed, "same": same,
+1248                  "locked": k_blocks, "draw": t_blocks, "page": None,
+1249                  "dead": False,
+1250                  "mirror": bool(mirror and ready
+1251                                 and mode in ("inplace", "facing"))}
+1252         if entry["mirror"]:
+1253             if mode == "inplace":
+1254                 entry["page"] = base.pages[index]
+1255                 entry["draw"] = all_blocks
+1256             elif not changed:
+1257                 entry["page"] = src.pages[index]
+1258                 entry["draw"] = []
+1259         plan[index] = entry
+1260 
+1261     live = None
+1262     if mirror:
+1263         todo = [i for i in sorted(plan)
+1264                 if plan[i]["mirror"] and plan[i]["mode"] == "facing"
+1265                 and plan[i]["changed"]]
+1266         if todo:
+1267             surg = PdfWriter(clone_from=src)
+1268             for i in todo:
+1269                 p = plan[i]
+1270                 try:
+1271                     _surgical_strip(surg, i, p["changed"],
+1272                                     p["locked"] + p["same"])
+1273                 except Exception:
+1274                     pass
+1275             live = _freeze(surg, folder, "stage_surgical.pdf")
+1276             bad = []
+1277             for i in todo:
+1278                 p = plan[i]
+1279                 forbidden = [_norm(b.get("text", ""))
+1280                              for b in p["locked"] + p["same"]]
+1281                 if _wording_gone(live.pages[i], p["changed"], forbidden):
+1282                     p["page"] = live.pages[i]
+1283                     p["draw"] = p["changed"]
+1284                 else:
+1285                     bad.append(i)
+1286             if bad:
+1287                 full = PdfWriter(clone_from=live)
+1288                 for i in bad:
+1289                     try:
+1290                         _strip_page(full, i)
+1291                     except Exception:
+1292                         pass
+1293                 live = _freeze(full, folder, "stage_full.pdf")
+1294                 for i in bad:
+1295                     p = plan[i]
+1296                     if _wording_gone(live.pages[i], p["changed"], []):
+1297                         p["page"] = live.pages[i]
+1298                         p["draw"] = p["changed"] + p["same"] + [
+1299                             b for b in p["locked"]
+1300                             if _readable_locked(b) or _marker_locked(b)]
+1301                         redrawn.append(i + 1)
+1302                     else:
+1303                         p["dead"] = True
+1304 
+1305     def readable_extras(p):
+1306         return p["changed"] + p["same"] + [
+1307             b for b in p["locked"]
+1308             if _readable_locked(b) or _marker_locked(b)]
+1309 
+1310     def assemble():
+1311         out = PdfWriter()
+1312         mapping.clear()
+1313         del overflow[:]
+1314         del facing[:]
+1315         del mirrored[:]
+1316         del fallback[:]
+1317         del unplaced[:]
+1318         min_font[0] = 99.0
+1319         for index in range(job["pages_total"]):
+1320             p = plan[index]
+1321             key = p["key"]
+1322             mapping[index] = len(out.pages)
+1323             if p["mirror"] and p["dead"]:
+1324                 fallback.append(index + 1)
+1325                 out.add_page(src.pages[index])
+1326                 continue
+1327             if p["mirror"]:
+1328                 origin = p["page"] if p["page"] is not None \
+1329                     else src.pages[index]
+1330                 out.add_page(origin)
+1331                 page = out.pages[-1]
+1332                 width = float(page.mediabox.width)
+1333                 height = float(page.mediabox.height)
+1334                 page_over = []
+1335                 used = [99.0]
+1336                 draw_list = p["draw"]
+1337                 if draw_list:
+1338                     def drawer(doc, draw_list=draw_list, p=p,
+1339                                page_over=page_over, used=used):
+1340                         used[0] = _draw_blocks(
+1341                             doc, draw_list, p["trans"], p["all"],
+1342                             page_over, p["key"], MIRROR_SCALE,
+1343                             MIRROR_FLOOR, True, True)
+1344                     page.merge_page(_overlay_page(width, height, drawer))
+1345                     min_font[0] = min(min_font[0], used[0])
+1346                 mirrored.append(index + 1)
+1347                 if page_over:
+1348                     unplaced.append(index + 1)
+1349                     overflow.extend(page_over)
+1350                 continue
+1351             if p["mode"] == "inplace" and p["ready"]:
+1352                 out.add_page(base.pages[index])
+1353                 page = out.pages[-1]
+1354                 width = float(page.mediabox.width)
+1355                 height = float(page.mediabox.height)
+1356                 page_over = []
+1357 
+1358                 def drawer(doc, p=p, page_over=page_over, key=key,
+1359                            min_scale=min_scale):
+1360                     _draw_blocks(doc, p["all"], p["trans"], p["all"],
+1361                                  page_over, key, min_scale, 5.0,
+1362                                  False, False)
+1363                 page.merge_page(_overlay_page(width, height, drawer))
+1364                 overflow.extend(page_over)
+1365             elif p["mode"] == "facing" and p["ready"]:
+1366                 box = src.pages[index].mediabox
+1367                 extra = _facing_pages(job, key, index + 1,
+1368                                       float(box.width), float(box.height))
+1369                 replaced = facing_style == "replace"
+1370                 if not replaced:
+1371                     out.add_page(src.pages[index])
+1372                 for piece in extra:
+1373                     out.add_page(piece)
+1374                 facing.append({"page": index + 1, "added": len(extra),
+1375                                "replaced": replaced})
+1376             else:
+1377                 out.add_page(src.pages[index])
+1378         return out
+1379 
+1380     def audit(path):
+1381         bad = []
+1382         try:
+1383             with open(path, "rb") as stream:
+1384                 check = PdfReader(io.BytesIO(stream.read()))
+1385             for number in mirrored:
+1386                 p = plan[number - 1]
+1387                 if not p["changed"]:
+1388                     continue
+1389                 forbidden = [_norm(b.get("text", ""))
+1390                              for b in p["locked"] + p["same"]]
+1391                 forbidden += [_norm(v) for v in p["trans"].values()]
+1392                 if not _wording_gone(check.pages[number - 1],
+1393                                      p["changed"], forbidden):
+1394                     bad.append(number - 1)
+1395         except Exception:
+1396             return []
+1397         return bad
+1398 
+1399     def finish_file(out):
+1400         count = _copy_outline(src, out, mapping, custom)
+1401         if meta_title:
+1402             out.add_metadata({"/Title": meta_title})
+1403         _save(out, target)
+1404         return count
+1405 
+1406     writer = assemble()
+1407     marks = finish_file(writer)
+1408     if mirror and mirrored:
+1409         bad = audit(target)
+1410         if bad:
+1411             try:
+1412                 fix = PdfWriter(clone_from=live if live is not None
+1413                                 else src)
+1414                 for i in bad:
+1415                     _strip_page(fix, i)
+1416                 fixed = _freeze(fix, folder, "stage_repair.pdf")
+1417                 for i in bad:
+1418                     p = plan[i]
+1419                     if _wording_gone(fixed.pages[i], p["changed"], []):
+1420                         p["page"] = fixed.pages[i]
+1421                         p["draw"] = readable_extras(p)
+1422                         redrawn.append(i + 1)
+1423                     else:
+1424                         p["dead"] = True
+1425                 writer = assemble()
+1426                 marks = finish_file(writer)
+1427                 leftovers = [i + 1 for i in audit(target)]
+1428             except Exception:
+1429                 leftovers = [i + 1 for i in bad]
+1430     mirror_info = {"requested": mirror, "mirrored": mirrored,
+1431                    "fallback": fallback, "redrawn": sorted(set(redrawn)),
+1432                    "unplaced": sorted(set(unplaced)),
+1433                    "leftovers": sorted(set(leftovers)),
+1434                    "min_font": round(min_font[0], 2) if mirrored else None}
+1435     return overflow, marks, facing, len(writer.pages), mirror_info
+1436 
+1437 # --------------------------------------------------------------- registration

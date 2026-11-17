@@ -1,0 +1,1243 @@
+----- 326-370 -----
+326 def _private_resources(owner, writer):
+327     """Give this page/form its own copies of every form it uses.
+328     v8: resources may be inherited from the Pages tree - resolve them
+329     before cloning, so containers are never missed.
+330     """
+331     res = _resolve(owner.get("/Resources"))
+332     if res is None:
+333         parent = owner.get("/Parent")
+334         hops = 0
+335         while res is None and parent is not None and hops < 32:
+336             node = _resolve(parent)
+337             if node is None:
+338                 break
+339             res = _resolve(node.get("/Resources"))
+340             parent = node.get("/Parent")
+341             hops += 1
+342     res = res or DictionaryObject()
+343     new_res = DictionaryObject(res)
+344     xo = _resolve(res.get("/XObject")) or {}
+345     if xo:
+346         new_xo = DictionaryObject()
+347         for name, ref in xo.items():
+348             obj = _resolve(ref)
+349             try:
+350                 is_form = obj.get("/Subtype") == "/Form"
+351             except Exception:
+352                 is_form = False
+353             if is_form:
+354                 clone = DecodedStreamObject()
+355                 try:
+356                     clone.set_data(obj.get_data())
+357                 except Exception:
+358                     new_xo[NameObject(name)] = ref
+359                     continue
+360                 for key, value in obj.items():
+361                     if key not in ("/Length", "/Filter"):
+362                         clone[NameObject(key)] = value
+363                 new_xo[NameObject(name)] = writer._add_object(clone)
+364             else:
+365                 new_xo[NameObject(name)] = ref
+366         new_res[NameObject("/XObject")] = new_xo
+367     owner[NameObject("/Resources")] = new_res
+368     return new_res
+369 
+370 def _hex_of(values):
+----- 497-595 -----
+497 def _text_free(operations):
+498     """Structural removal: drop whole BT...ET text objects."""
+499     out, depth = [], 0
+500     for operands, op in operations:
+501         if op == b"BT":
+502             depth += 1
+503             continue
+504         if op == b"ET":
+505             if depth:
+506                 depth -= 1
+507             continue
+508         if depth == 0:
+509             out.append((operands, op))
+510     return out
+511 
+512 
+513 def _forms_text_free(res, writer, seen=None, depth=0):
+514     """Walk EVERY form by resources (not by Do calls) and remove text.
+515     Each level gets private clones first, so shared forms stay safe.
+516     """
+517     if seen is None:
+518         seen = set()
+519     if depth > 16:
+520         return
+521     xo = _resolve(res.get("/XObject")) or {}
+522     for name, ref in xo.items():
+523         form = _resolve(ref)
+524         try:
+525             if form is None or form.get("/Subtype") != "/Form":
+526                 continue
+527         except Exception:
+528             continue
+529         if id(form) in seen:
+530             continue
+531         seen.add(id(form))
+532         try:
+533             child_res = _private_resources(form, writer)
+534             ops = ContentStream(form, writer).operations
+535             cs = ContentStream(None, writer)
+536             cs.operations = _text_free(ops)
+537             form.set_data(cs.get_data())
+538             _forms_text_free(child_res, writer, seen, depth + 1)
+539         except Exception:
+540             pass
+541 
+542 
+543 def _freeze(writer, folder, name):
+544     """Save the working writer and read it back.
+545     Text extraction from an in-memory page can differ from extraction of
+546     the very same bytes after a save/load round trip (font and string
+547     objects are rebuilt). Every honesty check therefore runs on a file
+548     that was written and re-read, never on the in-memory writer.
+549     """
+550     import io
+551     from pypdf import PdfReader
+552     path = os.path.join(folder, name)
+553     _save(writer, path)
+554     with open(path, "rb") as stream:
+555         data = stream.read()
+556     return PdfReader(io.BytesIO(data))
+557 
+558 
+559 def _set_contents(page, writer, operations):
+560     """Store page commands as plain bytes, not as a live ContentStream."""
+561     cs = ContentStream(None, writer)
+562     cs.operations = operations
+563     stream = DecodedStreamObject()
+564     stream.set_data(cs.get_data())
+565     page[NameObject("/Contents")] = writer._add_object(stream)
+566 
+567 
+568 def _strip_page(writer, index):
+569     """Remove every text-showing command on the page AND in its forms."""
+570     page = writer.pages[index]
+571     contents = page.get_contents()
+572     if contents is None:
+573         return False
+574     res = _private_resources(page, writer)
+575     stream = ContentStream(contents, writer)
+576     kept = _replay(stream.operations, [1, 0, 0, 1, 0, 0], "#000000", res,
+577                    writer, writer, "all", [], [], [])
+578     kept = _text_free(kept)
+579     _forms_text_free(res, writer)
+580     _set_contents(page, writer, kept)
+581     return True
+582 
+583 def _block_needles(block, forbidden):
+584     out = []
+585     for line in str(block.get("text", "")).split("\n"):
+586         needle = _norm(line)[:60]
+587         if len(needle) < 4:
+588             continue
+589         if any(needle in f for f in forbidden):
+590             continue
+591         out.append(needle)
+592     return out
+593 
+594 
+595 def _wording_gone(page, blocks, forbidden):
+----- 709-792 -----
+709 def _font_metrics(font_dict):
+710     try:
+711         name = str(font_dict.get("/BaseFont", "")) or str(id(font_dict))
+712     except Exception:
+713         name = str(id(font_dict))
+714     if name in _METRICS:
+715         return _METRICS[name]
+716     table, values = {}, []
+717     try:
+718         widths = font_dict.get("/Widths")
+719         if widths:
+720             first = int(font_dict.get("/FirstChar", 0))
+721             for index, value in enumerate(widths):
+722                 value = float(value)
+723                 if value > 0:
+724                     table[chr(first + index)] = value
+725                     values.append(value)
+726         else:
+727             descendants = font_dict.get("/DescendantFonts")
+728             child = descendants[0].get_object() if descendants else None
+729             if child is not None:
+730                 advances = {}
+731                 raw = [x.get_object() if hasattr(x, "get_object") else x
+732                        for x in child.get("/W", [])]
+733                 index = 0
+734                 while index < len(raw):
+735                     if index + 1 < len(raw) and isinstance(raw[index + 1],
+736                                                            (list, tuple)):
+737                         for offset, value in enumerate(raw[index + 1]):
+738                             advances[int(raw[index]) + offset] = float(value)
+739                         index += 2
+740                     elif index + 2 < len(raw):
+741                         for cid in range(int(raw[index]),
+742                                          int(raw[index + 1]) + 1):
+743                             advances[cid] = float(raw[index + 2])
+744                         index += 3
+745                     else:
+746                         break
+747                 values = [v for v in advances.values() if v > 0]
+748                 try:
+749                     data = (font_dict["/ToUnicode"].get_object()
+750                             .get_data().decode("latin-1"))
+751                 except Exception:
+752                     data = ""
+753                 for chunk in re.findall(r"beginbfchar(.*?)endbfchar", data, re.S):
+754                     for src, dst in re.findall(
+755                             r"<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>", chunk):
+756                         cid = int(src, 16)
+757                         if cid not in advances or len(dst) % 4:
+758                             continue
+759                         try:
+760                             letter = "".join(chr(int(dst[k:k + 4], 16))
+761                                              for k in range(0, len(dst), 4))
+762                         except ValueError:
+763                             continue
+764                         if len(letter) == 1:
+765                             table[letter] = advances[cid]
+766                 for chunk in re.findall(r"beginbfrange(.*?)endbfrange",
+767                                         data, re.S):
+768                     for lo, hi, dst in re.findall(
+769                             r"<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>"
+770                             r"\s*<([0-9A-Fa-f]+)>", chunk):
+771                         first, last, base = int(lo, 16), int(hi, 16), int(dst, 16)
+772                         for cid in range(first, min(last, first + 255) + 1):
+773                             code = base + cid - first
+774                             if cid in advances and 0 <= code <= 0x10FFFF:
+775                                 table[chr(code)] = advances[cid]
+776     except Exception:
+777         table, values = {}, []
+778     good = sorted(v for v in values if v > 0)
+779     default = good[len(good) // 2] if good else 500.0
+780     _METRICS[name] = (table, default)
+781     return _METRICS[name]
+782 
+783 
+784 def _span_width(font_dict, size, text):
+785     table, default = _font_metrics(font_dict)
+786     total = 0.0
+787     for ch in text:
+788         total += table.get(ch, default)
+789     return total / 1000.0 * size
+790 
+791 
+792 def _page_spans(page):
+----- 999-1043 -----
+999 def _variant(kind, serif=False):
+1000     family = "RefSerif " if serif else "RefSans "
+1001     key = family + kind
+1002     if key in _VARIANTS:
+1003         return _VARIANTS[key]
+1004     folder = os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts")
+1005     if serif:
+1006         choices = {"Bold": ("timesbd.ttf",),
+1007                    "Italic": ("timesi.ttf",),
+1008                    "BoldItalic": ("timesbi.ttf",)}.get(kind, ("times.ttf",))
+1009     else:
+1010         choices = {"Bold": ("segoeuib.ttf", "arialbd.ttf"),
+1011                    "Italic": ("segoeuii.ttf", "ariali.ttf"),
+1012                    "BoldItalic": ("segoeuiz.ttf", "arialbi.ttf")}.get(kind, ())
+1013     for file_name in choices:
+1014         path = os.path.join(folder, file_name)
+1015         if not os.path.isfile(path):
+1016             continue
+1017         try:
+1018             pdfmetrics.registerFont(TTFont(key, path))
+1019         except Exception:
+1020             continue
+1021         _VARIANTS[key] = key
+1022         return key
+1023     return _font_name()
+1024 
+1025 
+1026 def _block_font(block):
+1027     _font_name()
+1028     name = str(block.get("font", "")).lower()
+1029     bold = any(t in name for t in ("bold", "black", "heavy", "semibold"))
+1030     italic = "italic" in name or "oblique" in name
+1031     serif = _serif_name(name)
+1032     if bold and italic:
+1033         return _variant("BoldItalic", serif)
+1034     if bold:
+1035         return _variant("Bold", serif)
+1036     if italic:
+1037         return _variant("Italic", serif)
+1038     if serif:
+1039         return _variant("Regular", True)
+1040     return _font_name()
+1041 
+1042 
+1043 def _fit_block(block, text, font, min_scale, floor_abs=5.0, tight=False):
+----- 1585-2549 -----
+1585     def t_fill(a):
+1586         _need_pdf()
+1587         job, folder = _open_job(sb, a)
+1588         entries = a.get("pages")
+1589         if entries is None and a.get("page") is not None:
+1590             entries = [{"page": a["page"], "blocks": a.get("blocks"),
+1591                         "keep": a.get("keep"),
+1592                         "on_overflow": a.get("on_overflow")}]
+1593         if isinstance(entries, dict):
+1594             entries = [entries]
+1595         if not entries or not isinstance(entries, list):
+1596             raise ToolError("'pages' must be a list like "
+1597                             "[{page: 3, blocks: {t1: '...'}}]")
+1598         if len(entries) > MAX_FILL_PAGES:
+1599             raise ToolError("This call covers %d pages (max %d)"
+1600                             % (len(entries), MAX_FILL_PAGES))
+1601         chars = 0
+1602         for entry in entries:
+1603             for value in (entry.get("blocks") or {}).values():
+1604                 if isinstance(value, str):
+1605                     chars += len(value)
+1606         if chars > MAX_FILL_CHARS:
+1607             raise ToolError("This call carries %d characters (max %d) - "
+1608                             "send fewer pages" % (chars, MAX_FILL_CHARS))
+1609         min_scale = float(job.get("min_scale", 0.7))
+1610         rejects = job.setdefault("rejects", {})
+1611         staged = []
+1612         for entry in entries:
+1613             if not isinstance(entry, dict):
+1614                 raise ToolError("Each 'pages' entry must be an object")
+1615             try:
+1616                 number = int(entry.get("page", 0))
+1617             except (TypeError, ValueError):
+1618                 raise ToolError("'page' must be a number")
+1619             key = str(number)
+1620             if key not in job["status"]:
+1621                 raise ToolError("Page %d is not part of this job (selected "
+1622                                 "pages: %s)"
+1623                                 % (number,
+1624                                    sorted(int(k) for k in job["status"])[:30]))
+1625             if entry.get("keep"):
+1626                 staged.append((key, None, False))
+1627                 continue
+1628             texts = entry.get("blocks")
+1629             if not isinstance(texts, dict) or not texts:
+1630                 raise ToolError("Page %d: 'blocks' must be a non-empty object "
+1631                                 "{block_id: translated text}" % number)
+1632             if job["mode"].get(key) not in ("inplace", "facing"):
+1633                 raise ToolError("Page %d is kept in the original language - "
+1634                                 "nothing is drawn there" % number)
+1635             known = {b["id"]: b for b in job["blocks"].get(key, [])}
+1636             unknown = [k for k in texts if k not in known]
+1637             if unknown:
+1638                 raise ToolError("Page %d: unknown block ids %s. Valid ids: %s"
+1639                                 % (number, unknown[:10], list(known)[:30]))
+1640             for bid, value in texts.items():
+1641                 if not isinstance(value, str) or not value.strip():
+1642                     raise ToolError("Page %d block %s: the translation must "
+1643                                     "be a non-empty string" % (number, bid))
+1644             force = str(entry.get("on_overflow") or "").lower() == "facing"
+1645             staged.append((key, texts, force))
+1646         rejected, notes, touched = [], [], []
+1647         for key, texts, force in staged:
+1648             if texts is None:
+1649                 if job["status"][key] in ("pending", "done"):
+1650                     job["status"][key] = "kept"
+1651                     job["mode"][key] = "kept"
+1652                     job["translations"].pop(key, None)
+1653                     rejects.pop(key, None)
+1654                 touched.append(int(key))
+1655                 continue
+1656             if force and job["mode"].get(key) == "inplace":
+1657                 job["mode"][key] = "facing"
+1658                 rejects.pop(key, None)
+1659                 notes.append("page %s moved to facing on request - length "
+1660                              "no longer matters there" % key)
+1661             page_rejects = rejects.setdefault(key, {})
+1662             accepted = {}
+1663             if job["mode"].get(key) == "inplace":
+1664                 known = {b["id"]: b for b in job["blocks"].get(key, [])}
+1665                 flip = False
+1666                 for bid, value in texts.items():
+1667                     block = known[bid]
+1668                     lines, size, over, lead, hs = _fit_block(
+1669                         block, value, _block_font(block), min_scale)
+1670                     if not over:
+1671                         accepted[bid] = value
+1672                         page_rejects.pop(bid, None)
+1673                         continue
+1674                     count = int(page_rejects.get(bid, 0)) + 1
+1675                     page_rejects[bid] = count
+1676                     if count >= MAX_REJECTS:
+1677                         flip = True
+1678                     else:
+1679                         rejected.append(
+1680                             {"page": int(key), "id": bid,
+1681                              "chars": len(value),
+1682                              "max_chars": block["max_chars"],
+1683                              "width_pt": round(block.get("x_room",
+1684                                                          block["x1"])
+1685                                                - block["x0"], 1),
+1686                              "original": block["text"][:60]})
+1687                 if flip:
+1688                     job["mode"][key] = "facing"
+1689                     accepted = dict(texts)
+1690                     rejected = [r for r in rejected if r["page"] != int(key)]
+1691                     rejects.pop(key, None)
+1692                     notes.append("page %s moved to facing after %d refusals "
+1693                                  "of one block - all its wording is accepted "
+1694                                  "there" % (key, MAX_REJECTS))
+1695             else:
+1696                 accepted = dict(texts)
+1697             if accepted:
+1698                 job["translations"].setdefault(key, {}).update(accepted)
+1699             job["status"][key] = ("done" if not _missing(job, key)
+1700                                   else "pending")
+1701             touched.append(int(key))
+1702         _dump_job(job, folder)
+1703         overflow, marks, facing, pages, mirror_info = _render(
+1704             job, folder, os.path.join(folder, "work.pdf"), partial_ok=True)
+1705         payload = _payload(job, folder)
+1706         payload["filled_pages"] = touched
+1707         payload["rejected"] = rejected
+1708         payload["notes"] = notes
+1709         payload["still_missing"] = {k: _missing(job, k) for k in job["status"]
+1710                                     if job["status"][k] == "pending"}
+1711         payload["overflow"] = [o for o in overflow if o["page"] in touched]
+1712         if rejected:
+1713             payload["hint"] = ("Everything that fits is ALREADY SAVED. Shorten "
+1714                                "only the blocks listed in 'rejected' to their "
+1715                                "max_chars and send just those again - or send "
+1716                                "the page with on_overflow:'facing'. " + WORKFLOW)
+1717         return payload
+1718 
+1719     def t_finish(a):
+1720         _need_pdf()
+1721         job, folder = _open_job(sb, a)
+1722         pending = sorted(int(k) for k, v in job["status"].items()
+1723                          if v == "pending")
+1724         partial = bool(a.get("allow_partial"))
+1725         if pending and not partial:
+1726             raise ToolError("%d pages are not finished: %s. Send the missing "
+1727                             "blocks (see 'still_missing' of the last fill), "
+1728                             "or pass allow_partial:true to leave them in the "
+1729                             "original language." % (len(pending), pending[:25]))
+1730         facing_style = str(a.get("facing") or "mirror").lower()
+1731         if facing_style not in ("append", "replace", "mirror"):
+1732             raise ToolError("'facing' must be 'mirror' (default - same page "
+1733                             "count and layout), 'append' or 'replace'; use "
+1734                             "the last two only on an explicit user request")
+1735         custom = a.get("outline")
+1736         if custom is not None and not isinstance(custom, list):
+1737             raise ToolError("'outline' must be a list of {title, page, parent}")
+1738         default_out = os.path.join(sb, job["id"] + "_ru.pdf")
+1739         target = _pdf_target(win, {"path": a.get("out") or default_out,
+1740                                    "overwrite": a.get("overwrite")})
+1741         title = None
+1742         try:
+1743             meta = _reader(job["source"]).metadata or {}
+1744             old = str(meta.get("/Title") or "")
+1745             title = (old + " - RU") if old else job["id"] + " (RU)"
+1746         except Exception:
+1747             pass
+1748         overflow, marks, facing, pages, mirror_info = _render(
+1749             job, folder, target, partial_ok=True,
+1750             meta_title=title, custom=custom, facing_style=facing_style)
+1751         placed, place_note = None, ""
+1752         if a.get("place", True):
+1753             args = {"path": target}
+1754             uid = job.get("source_uid")
+1755             if uid:
+1756                 try:
+1757                     rect = win.full_rect(tools._item(uid))
+1758                     args["x"] = rect.right() + 40
+1759                     args["y"] = rect.top()
+1760                 except Exception:
+1761                     pass
+1762             try:
+1763                 placed = tools.t_add_image(args).get("item")
+1764             except Exception as ex:
+1765                 place_note = ("The file is saved but could not be placed on "
+1766                               "the board: %s" % ex)
+1767         job["finished"] = target
+1768         _dump_job(job, folder)
+1769         warnings = list(job.get("warnings", []))
+1770         replaced = [f["page"] for f in facing if f.get("replaced")]
+1771         if replaced:
+1772             warnings.append("facing:'replace' - pages %s were replaced by "
+1773                             "Russian pages; the drawings of those pages are "
+1774                             "not in the result" % replaced)
+1775         if mirror_info["requested"]:
+1776             if mirror_info["redrawn"]:
+1777                 warnings.append("pages %s were fully redrawn (wording and "
+1778                                 "labels) to keep the layout"
+1779                                 % mirror_info["redrawn"])
+1780             if mirror_info["fallback"]:
+1781                 warnings.append("pages %s could not be cleaned and ship in "
+1782                                 "the original language"
+1783                                 % mirror_info["fallback"])
+1784             if mirror_info.get("leftovers"):
+1785                 warnings.append("pages %s still show some original wording"
+1786                                 % mirror_info["leftovers"])
+1787             if mirror_info["unplaced"]:
+1788                 warnings.append("pages %s have wording squeezed to the limit"
+1789                                 % mirror_info["unplaced"])
+1790             if mirror_info["min_font"] is not None \
+1791                     and mirror_info["min_font"] < 5.0:
+1792                 warnings.append("mirror shrank some fine print to %.1f pt "
+1793                                 "to keep the layout" % mirror_info["min_font"])
+1794         if place_note:
+1795             warnings.append(place_note)
+1796         return {"path": target, "pages": pages,
+1797                 "pages_source": job["pages_total"],
+1798                 "bytes": os.path.getsize(target),
+1799                 "placed_item": placed, "bookmarks": marks,
+1800                 "facing_style": facing_style,
+1801                 "mirror": mirror_info,
+1802                 "russian_pages_added": facing,
+1803                 "left_in_original": pending if partial else [],
+1804                 "kept_pages": sorted(int(k) for k, v in job["mode"].items()
+1805                                      if v == "kept"),
+1806                 "empty_pages": sorted(int(k) for k, v in job["mode"].items()
+1807                                       if v == "empty"),
+1808                 "overflow": overflow[:40], "warnings": warnings[:20],
+1809                 "hint": "Done - same page count and layout as the source, "
+1810                         "colours and font character kept. Screenshots stay "
+1811                         "in the original language."}
+1812 
+1813     tools._add("board_pdf_translate_start",
+1814                "Begin translating a PDF while KEEPING its exact appearance. "
+1815                "Source is 'path' INSIDE the agent folder '%s' or 'uid' of a "
+1816                "board document. The result ALWAYS keeps the source layout, "
+1817                "page count, colours and font character - never ask the user "
+1818                "about modes, just translate and deliver. Returns a job id and "
+1819                "'next' - the first batch of blocks with original text and "
+1820                "max_chars. Translate them, call board_pdf_translate_fill, "
+1821                "repeat until 'next' is null, then board_pdf_translate_finish. "
+1822                "Markers, pin labels and unreadable labels are never offered. "
+1823                "skip_pages leaves pages alone. Calling start again resumes; "
+1824                "restart:true rebuilds." % sb,
+1825                S({"path": path_arg, "uid": uid_arg,
+1826                   "pages": {"type": "string",
+1827                             "description": "Pages to translate, '1-3,5' or "
+1828                                            "'all' (default all)"},
+1829                   "skip_pages": {"type": "string",
+1830                                  "description": "Pages to leave untouched"},
+1831                   "min_scale": {"type": "number",
+1832                                 "description": "Lowest font shrink factor "
+1833                                                "0.5-1 (default 0.7)"},
+1834                   "password": {"type": "string"},
+1835                   "restart": {"type": "boolean"}}),
+1836                t_start)
+1837     tools._add("board_pdf_translate_fill",
+1838                "Feed translations into a job. 'pages' is [{page: 3, blocks: "
+1839                "{t1: 'wording', ...}}]; one page may be sent as 'page' + "
+1840                "'blocks'. Use the ids and the original 'text' from 'next' - "
+1841                "never invent ids. PARTIAL ACCEPT: wording that fits is saved "
+1842                "immediately; wording that is too long comes back in "
+1843                "'rejected' with its max_chars budget - shorten ONLY those "
+1844                "blocks and send them again. A block refused twice moves its "
+1845                "page to 'facing' internally; {page: n, on_overflow: 'facing'} "
+1846                "does that at once. A page is finished only when every block "
+1847                "is translated; 'still_missing' lists what is left. "
+1848                "{page: n, keep: true} keeps a page untouched.",
+1849                S({"job": job_arg,
+1850                   "pages": {"type": "array",
+1851                             "items": {"type": "object"},
+1852                             "description": "[{page, blocks:{id:text}, "
+1853                                            "on_overflow:'facing'} or "
+1854                                            "{page, keep:true}]"},
+1855                   "page": {"type": "integer"},
+1856                   "blocks": {"type": "object"},
+1857                   "on_overflow": {"type": "string",
+1858                                   "description": "'facing' to move this page "
+1859                                                  "to facing mode right away"},
+1860                   "keep": {"type": "boolean"}},
+1861                  ["job"]),
+1862                t_fill)
+1863     tools._add("board_pdf_translate_finish",
+1864                "Assemble the translated PDF INSIDE the agent folder '%s' "
+1865                "(default name <job>_ru.pdf) and place it on the board next to "
+1866                "the source (place:false to skip). Refuses while pages are "
+1867                "unfinished unless allow_partial:true. THE DEFAULT AND "
+1868                "STANDARD delivery is 'mirror': SAME page count and layout, "
+1869                "always - mirror never adds pages. Only translated wording is "
+1870                "lifted out (including text inside form containers); pictures, "
+1871                "table rules, pin labels, colours and serif/sans character "
+1872                "stay. Fitting ladder: free space below, half size, tighter "
+1873                "spacing, 4 pt floor, horizontal squeeze to 55 percent as the last resort. Never discuss "
+1874                "modes with the user. 'append' and 'replace' only on explicit "
+1875                "user request. Bookmarks are remapped; pass 'outline' "
+1876                "[{title, page, parent}] for translated titles. Existing files "
+1877                "need overwrite:true." % sb,
+1878                S({"job": job_arg,
+1879                   "out": {"type": "string",
+1880                           "description": "Result file inside the agent folder"},
+1881                   "facing": {"type": "string",
+1882                              "description": "'mirror' (default, keeps the "
+1883                                             "source appearance and page "
+1884                                             "count); 'append' or 'replace' "
+1885                                             "only on explicit user request"},
+1886                   "outline": {"type": "array", "items": {"type": "object"}},
+1887                   "allow_partial": {"type": "boolean"},
+1888                   "place": {"type": "boolean"},
+1889                   "overwrite": over_arg},
+1890                  ["job"]),
+1891                t_finish)
+1892 
+1893 
+1894 # ------------------------------------------------------------------ self-test
+1895 def _selftest():
+1896     """python -m refsynapse.ai.board_pdf_translate_tools  (opens the window)"""
+1897     import sys
+1898     from PySide6.QtCore import QTimer
+1899     from PySide6.QtWidgets import QApplication
+1900     from ..main_window import MainWindow
+1901     from .board_tools import BoardTools
+1902 
+1903     app = QApplication(sys.argv)
+1904     win = MainWindow()
+1905     win.show()
+1906     tools = BoardTools(win)
+1907     print("Registered tools:", len(tools.names()))
+1908     for name in PDF_TRANSLATE_TOOL_NAMES:
+1909         print("  has", name, "->", name in tools.names())
+1910     sb = sandbox_root(win)
+1911     print("agent sandbox ->", sb)
+1912 
+1913     def run():
+1914         folder = os.path.join(sb, "pdf_translate_selftest")
+1915         os.makedirs(folder, exist_ok=True)
+1916 
+1917         def p(name):
+1918             return os.path.join(folder, name)
+1919 
+1920         def show(label, result, *keys):
+1921             print(label, "->", result.get("ok"),
+1922                   [result.get(k) for k in keys], result.get("error", ""))
+1923 
+1924         fails = []
+1925 
+1926         def expect(label, cond):
+1927             print("  %s -> %s (expected True)" % (label, bool(cond)))
+1928             if not cond:
+1929                 fails.append(label)
+1930 
+1931         def refuse(label, result):
+1932             print("%s -> %s (expected False) %s"
+1933                   % (label, result.get("ok"), result.get("error", "")[:110]))
+1934             if result.get("ok"):
+1935                 fails.append(label)
+1936 
+1937         placed = []
+1938 
+1939         def remember(result):
+1940             uid = (result.get("placed_item") or {}).get("uid")
+1941             if uid:
+1942                 placed.append(uid)
+1943 
+1944         def job_of(job_id):
+1945             return _load_job(_job_paths(sb, job_id)[1])
+1946 
+1947         made = tools.call("board_pdf_create",
+1948                           {"path": p("src.pdf"),
+1949                            "text": "Chapter One\n\nHello world. This "
+1950                                    "paragraph explains how to install the "
+1951                                    "memory modules.\n\nSecond paragraph "
+1952                                    "about the CPU cooler.",
+1953                            "font_size": 12, "overwrite": True})
+1954         show("create source", made, "pages")
+1955         if not made.get("ok"):
+1956             print("DONE - close the window to exit")
+1957             return
+1958         st = tools.call("board_pdf_translate_start",
+1959                         {"path": p("src.pdf"), "restart": True})
+1960         show("start", st, "job", "progress")
+1961         job_id = st.get("job")
+1962         expect("page is inplace", (st.get("modes") or {}).get("1") == "inplace")
+1963         items = (st.get("next") or {}).get("items") or []
+1964         expect("blocks found", len(items) >= 2)
+1965         expect("ids are t*", all(i["id"].startswith("t") for i in items))
+1966         expect("budget offered", all(i.get("max_chars", 0) > 0 for i in items))
+1967         words = ["Глава первая",
+1968                  "Привет, мир. Здесь описана установка модулей памяти.",
+1969                  "Второй абзац о кулере процессора."]
+1970         first = items[0]
+1971         part = tools.call("board_pdf_translate_fill",
+1972                           {"job": job_id, "page": 1,
+1973                            "blocks": {first["id"]: words[0]}})
+1974         show("partial fill", part, "progress")
+1975         expect("page still pending",
+1976                (part.get("progress") or {}).get("pending") == 1)
+1977         expect("missing listed",
+1978                bool((part.get("still_missing") or {}).get("1")))
+1979         old = job_of(job_id)
+1980         old.pop("rejects", None)
+1981         _dump_job(old, _job_paths(sb, job_id)[0])
+1982         rest = {item["id"]: words[index % len(words)]
+1983                 for index, item in enumerate(items)}
+1984         full = tools.call("board_pdf_translate_fill",
+1985                           {"job": job_id, "page": 1, "blocks": rest})
+1986         show("full fill", full, "progress")
+1987         expect("old job tolerated", full.get("ok") is True)
+1988         expect("no pending", (full.get("progress") or {}).get("pending") == 0)
+1989         expect("next is null", full.get("next") is None)
+1990         expect("nothing rejected", not full.get("rejected"))
+1991         expect("no overflow", not full.get("overflow"))
+1992         work = os.path.join(sb, "translate", job_id or "", "work.pdf")
+1993         text = ""
+1994         if os.path.isfile(work):
+1995             text = _reader(work).pages[0].extract_text() or ""
+1996         expect("russian visible", "Привет" in text)
+1997         expect("english gone", "Hello world" not in text)
+1998         tools.call("board_pdf_translate_fill",
+1999                    {"job": job_id, "page": 1,
+2000                     "blocks": {first["id"]: "Глава первая"}})
+2001         text2 = ""
+2002         if os.path.isfile(work):
+2003             text2 = _reader(work).pages[0].extract_text() or ""
+2004         expect("redraw not doubled", text2.count("Глава первая") == 1)
+2005         refuse("unknown block id",
+2006                tools.call("board_pdf_translate_fill",
+2007                           {"job": job_id, "page": 1,
+2008                            "blocks": {"t999": "x"}}))
+2009         refuse("empty translation",
+2010                tools.call("board_pdf_translate_fill",
+2011                           {"job": job_id, "page": 1,
+2012                            "blocks": {first["id"]: "   "}}))
+2013         refuse("page outside job",
+2014                tools.call("board_pdf_translate_fill",
+2015                           {"job": job_id, "page": 9,
+2016                            "blocks": {"t1": "x"}}))
+2017         fin = tools.call("board_pdf_translate_finish",
+2018                          {"job": job_id, "out": p("final.pdf"),
+2019                           "overwrite": True})
+2020         show("finish", fin, "pages", "bookmarks", "facing_style")
+2021         remember(fin)
+2022         expect("placed on board",
+2023                (fin.get("placed_item") or {}).get("kind") == "document")
+2024         expect("no extra pages", fin.get("pages") == 1)
+2025         expect("default style mirror", fin.get("facing_style") == "mirror")
+2026         fin_m0 = tools.call("board_pdf_translate_finish",
+2027                             {"job": job_id, "out": p("final_mirror.pdf"),
+2028                              "facing": "mirror", "overwrite": True,
+2029                              "place": False})
+2030         show("finish mirror inplace", fin_m0, "pages", "mirror")
+2031         expect("mirror inplace one page", fin_m0.get("pages") == 1)
+2032         expect("mirror inplace listed",
+2033                1 in ((fin_m0.get("mirror") or {}).get("mirrored") or []))
+2034         if fin_m0.get("ok"):
+2035             tm0 = _reader(p("final_mirror.pdf")).pages[0].extract_text() or ""
+2036             expect("mirror inplace russian", "Привет" in tm0)
+2037             expect("mirror inplace english gone", "Hello world" not in tm0)
+2038         refuse("unknown job",
+2039                tools.call("board_pdf_translate_finish",
+2040                           {"job": "no_such_job"}))
+2041         outside = os.path.join(os.path.dirname(sb), "tr_escape.pdf")
+2042         refuse("write outside",
+2043                tools.call("board_pdf_translate_finish",
+2044                           {"job": job_id, "out": outside}))
+2045         print("outside created ->", os.path.exists(outside),
+2046               "(expected False)")
+2047         if os.path.exists(outside):
+2048             fails.append("sandbox escape")
+2049         st2 = tools.call("board_pdf_translate_start",
+2050                          {"path": p("src.pdf"), "skip_pages": "1",
+2051                           "restart": True})
+2052         show("start skip", st2, "progress")
+2053         expect("skip leaves no pending",
+2054                (st2.get("progress") or {}).get("pending") == 0)
+2055         fin2 = tools.call("board_pdf_translate_finish",
+2056                           {"job": st2.get("job"), "out": p("kept.pdf"),
+2057                            "overwrite": True, "place": False})
+2058         show("finish kept", fin2, "pages", "kept_pages")
+2059         text3 = ""
+2060         if fin2.get("ok"):
+2061             text3 = _reader(p("kept.pdf")).pages[0].extract_text() or ""
+2062         expect("original preserved", "Hello world" in text3)
+2063         st3 = tools.call("board_pdf_translate_start",
+2064                          {"path": p("src.pdf"), "restart": True})
+2065         refuse("finish too early",
+2066                tools.call("board_pdf_translate_finish",
+2067                           {"job": st3.get("job"), "out": p("early.pdf")}))
+2068         part2 = tools.call("board_pdf_translate_finish",
+2069                            {"job": st3.get("job"), "out": p("partial.pdf"),
+2070                             "allow_partial": True, "place": False,
+2071                             "overwrite": True})
+2072         show("allow_partial", part2, "left_in_original")
+2073         text4 = ""
+2074         if part2.get("ok"):
+2075             text4 = _reader(p("partial.pdf")).pages[0].extract_text() or ""
+2076         expect("partial keeps english", "Hello world" in text4)
+2077         resume = tools.call("board_pdf_translate_start",
+2078                             {"path": p("src.pdf")})
+2079         expect("resume works", resume.get("resumed") is True)
+2080         made2 = tools.call("board_pdf_create",
+2081                            {"path": p("tiny.pdf"),
+2082                             "text": "OK\n\n" + ("A very long paragraph about "
+2083                                                 "memory modules. " * 6),
+2084                             "font_size": 12, "overwrite": True})
+2085         show("create tiny", made2, "pages")
+2086         st_t = tools.call("board_pdf_translate_start",
+2087                           {"path": p("tiny.pdf"), "restart": True})
+2088         show("start tiny", st_t, "modes")
+2089         tiny_id = st_t.get("job")
+2090         items_t = (st_t.get("next") or {}).get("items") or []
+2091         target = None
+2092         for item in items_t:
+2093             if item["text"].strip() == "OK":
+2094                 target = item
+2095                 break
+2096         if target is None:
+2097             fails.append("no small block found")
+2098         else:
+2099             long_ru = ("Очень длинный русский текст, который никак "
+2100                        "не помещается в маленькую клетку заголовка.")
+2101             others = {i["id"]: "Короткая русская строка."
+2102                       for i in items_t if i["id"] != target["id"]}
+2103             send = dict(others)
+2104             send[target["id"]] = long_ru
+2105             mix = tools.call("board_pdf_translate_fill",
+2106                              {"job": tiny_id, "page": 1, "blocks": send})
+2107             show("mixed fill", mix, "rejected", "progress")
+2108             expect("call accepted", mix.get("ok") is True)
+2109             rej = mix.get("rejected") or []
+2110             expect("long block rejected",
+2111                    any(r["id"] == target["id"] for r in rej))
+2112             expect("budget in rejected",
+2113                    all(r.get("max_chars", 0) > 0 and "width_pt" in r
+2114                        for r in rej))
+2115             expect("page still pending",
+2116                    (mix.get("progress") or {}).get("pending") == 1)
+2117             saved = job_of(tiny_id)
+2118             expect("fitting part saved",
+2119                    all(bid in saved["translations"].get("1", {})
+2120                        for bid in others))
+2121             expect("long part not saved",
+2122                    target["id"] not in saved["translations"].get("1", {}))
+2123             expect("refusal counted",
+2124                    saved.get("rejects", {}).get("1", {})
+2125                    .get(target["id"]) == 1)
+2126             again = tools.call("board_pdf_translate_fill",
+2127                                {"job": tiny_id, "page": 1,
+2128                                 "blocks": {target["id"]: long_ru}})
+2129             show("second refusal", again, "modes", "notes")
+2130             expect("auto facing",
+2131                    (again.get("modes") or {}).get("1") == "facing")
+2132             expect("all accepted after flip", not again.get("rejected"))
+2133             expect("page done after flip",
+2134                    (again.get("progress") or {}).get("pending") == 0)
+2135             fin_a = tools.call("board_pdf_translate_finish",
+2136                                {"job": tiny_id, "out": p("tiny_append.pdf"),
+2137                                 "facing": "append",
+2138                                 "overwrite": True, "place": False})
+2139             show("finish append", fin_a, "pages", "facing_style")
+2140             expect("append adds a page", fin_a.get("pages") == 2)
+2141             if fin_a.get("ok"):
+2142                 ra = _reader(p("tiny_append.pdf"))
+2143                 expect("append keeps original",
+2144                        "A very long paragraph"
+2145                        in (ra.pages[0].extract_text() or ""))
+2146                 expect("append russian page",
+2147                        "Очень" in (ra.pages[1].extract_text() or ""))
+2148             fin_r = tools.call("board_pdf_translate_finish",
+2149                                {"job": tiny_id, "out": p("tiny_replace.pdf"),
+2150                                 "facing": "replace",
+2151                                 "overwrite": True, "place": False})
+2152             show("finish replace", fin_r, "pages", "facing_style", "warnings")
+2153             expect("replace is ru only", fin_r.get("pages") == 1)
+2154             expect("replace style reported",
+2155                    fin_r.get("facing_style") == "replace")
+2156             expect("replace warns honestly",
+2157                    any("replace" in str(w)
+2158                        for w in fin_r.get("warnings") or []))
+2159             if fin_r.get("ok"):
+2160                 rr = _reader(p("tiny_replace.pdf"))
+2161                 all_text = " ".join(pg.extract_text() or ""
+2162                                     for pg in rr.pages)
+2163                 expect("replace has russian", "Очень" in all_text)
+2164                 expect("replace dropped english",
+2165                        "A very long paragraph" not in all_text)
+2166             fin_m = tools.call("board_pdf_translate_finish",
+2167                                {"job": tiny_id, "out": p("tiny_mirror.pdf"),
+2168                                 "facing": "mirror",
+2169                                 "overwrite": True, "place": False})
+2170             show("finish mirror", fin_m, "pages", "mirror")
+2171             expect("mirror keeps one page", fin_m.get("pages") == 1)
+2172             mir = fin_m.get("mirror") or {}
+2173             expect("mirror listed page", 1 in (mir.get("mirrored") or []))
+2174             expect("mirror no fallback", not mir.get("fallback"))
+2175             if fin_m.get("ok"):
+2176                 rm = _reader(p("tiny_mirror.pdf"))
+2177                 mt = rm.pages[0].extract_text() or ""
+2178                 expect("mirror russian in place", "Очень" in mt)
+2179                 expect("mirror english lifted",
+2180                        "A very long paragraph" not in mt)
+2181             fin_d = tools.call("board_pdf_translate_finish",
+2182                                {"job": tiny_id, "out": p("tiny_default.pdf"),
+2183                                 "overwrite": True, "place": False})
+2184             show("finish default facing job", fin_d, "pages", "facing_style")
+2185             expect("default keeps one page", fin_d.get("pages") == 1)
+2186             expect("default is mirror", fin_d.get("facing_style") == "mirror")
+2187         refuse("bad facing style",
+2188                tools.call("board_pdf_translate_finish",
+2189                           {"job": tiny_id, "out": p("bad.pdf"),
+2190                            "facing": "sideways", "place": False}))
+2191         made3 = tools.call("board_pdf_create",
+2192                            {"path": p("flow.pdf"),
+2193                             "text": "Chapter Two\n\n12345\n\n" +
+2194                                     ("This section explains the setup. " * 12),
+2195                             "font_size": 11, "overwrite": True})
+2196         show("create flow", made3, "pages")
+2197         st4 = tools.call("board_pdf_translate_start",
+2198                          {"path": p("flow.pdf"), "restart": True})
+2199         show("start flow", st4, "modes")
+2200         flow_id = st4.get("job")
+2201         job4 = job_of(flow_id)
+2202         expect("flow is inplace", job4["mode"].get("1") == "inplace")
+2203         expect("numeric block locked",
+2204                any(b["text"].strip() == "12345"
+2205                    for b in job4["locked"].get("1", [])))
+2206         blocks4 = {}
+2207         for b in job4["blocks"]["1"]:
+2208             if b["text"].startswith("Chapter"):
+2209                 blocks4[b["id"]] = "Глава вторая"
+2210             else:
+2211                 blocks4[b["id"]] = "Этот раздел объясняет настройку. " * 20
+2212         fill4 = tools.call("board_pdf_translate_fill",
+2213                            {"job": flow_id, "page": 1, "blocks": blocks4,
+2214                             "on_overflow": "facing"})
+2215         show("on_overflow fill", fill4, "modes", "rejected")
+2216         expect("forced facing",
+2217                (fill4.get("modes") or {}).get("1") == "facing")
+2218         expect("nothing rejected on facing", not fill4.get("rejected"))
+2219         expect("flow done",
+2220                (fill4.get("progress") or {}).get("pending") == 0)
+2221         fin4 = tools.call("board_pdf_translate_finish",
+2222                           {"job": flow_id, "out": p("flow_append.pdf"),
+2223                            "facing": "append",
+2224                            "overwrite": True, "place": False})
+2225         show("flow finish append", fin4, "pages", "russian_pages_added")
+2226         expect("flow page added", (fin4.get("pages") or 0) >= 2)
+2227         if fin4.get("ok"):
+2228             reader4 = _reader(p("flow_append.pdf"))
+2229             expect("flow original untouched",
+2230                    "This section explains"
+2231                    in (reader4.pages[0].extract_text() or ""))
+2232             ru_text = reader4.pages[1].extract_text() or ""
+2233             expect("flow russian readable", "Этот" in ru_text)
+2234             expect("readable locked shown", "12345" in ru_text)
+2235         fin5 = tools.call("board_pdf_translate_finish",
+2236                           {"job": flow_id, "out": p("flow_replace.pdf"),
+2237                            "facing": "replace",
+2238                            "overwrite": True, "place": False})
+2239         show("flow finish replace", fin5, "pages")
+2240         if fin5.get("ok"):
+2241             reader5 = _reader(p("flow_replace.pdf"))
+2242             all5 = " ".join(pg.extract_text() or "" for pg in reader5.pages)
+2243             expect("flow replace ru only",
+2244                    "This section explains" not in all5 and "Этот" in all5)
+2245         fin6 = tools.call("board_pdf_translate_finish",
+2246                           {"job": flow_id, "out": p("flow_mirror.pdf"),
+2247                            "facing": "mirror",
+2248                            "overwrite": True, "place": False})
+2249         show("flow finish mirror", fin6, "pages", "mirror")
+2250         expect("flow mirror one page", fin6.get("pages") == 1)
+2251         if fin6.get("ok"):
+2252             reader6 = _reader(p("flow_mirror.pdf"))
+2253             mt6 = reader6.pages[0].extract_text() or ""
+2254             expect("flow mirror russian", "Этот" in mt6)
+2255             expect("flow mirror english lifted",
+2256                    "This section explains" not in mt6)
+2257             expect("flow mirror locked kept", "12345" in mt6)
+2258         # ---- colour + serif fidelity (v6) ------------------------------
+2259         import io as _io
+2260         from reportlab.pdfgen import canvas as _cv
+2261         buf = _io.BytesIO()
+2262         cv = _cv.Canvas(buf, pagesize=(595, 842))
+2263         cv.setFont(_font_name(), 16)
+2264         cv.setFillColor(HexColor("#cc0000"))
+2265         cv.drawString(72, 760, "Color heading")
+2266         cv.setFillColor(HexColor("#000000"))
+2267         cv.setFont(_font_name(), 11)
+2268         cv.drawString(72, 720, "Black body text about the device.")
+2269         cv.showPage()
+2270         cv.save()
+2271         with open(p("color.pdf"), "wb") as stream:
+2272             stream.write(buf.getvalue())
+2273         st_c = tools.call("board_pdf_translate_start",
+2274                           {"path": p("color.pdf"), "restart": True})
+2275         show("start color", st_c, "modes")
+2276         cid = st_c.get("job")
+2277         jc = job_of(cid)
+2278         head = next((b for b in jc["blocks"].get("1", [])
+2279                      if b["text"].startswith("Color")), None)
+2280         body = next((b for b in jc["blocks"].get("1", [])
+2281                      if b["text"].startswith("Black")), None)
+2282         expect("heading colour stored",
+2283                head is not None and head.get("color") == "#cc0000")
+2284         expect("body colour stored",
+2285                body is not None and body.get("color") == "#000000")
+2286         expect("serif detected", _serif_name("/ABC+TimesNewRomanPS-BoldMT"))
+2287         expect("sans not serif", not _serif_name("/ABC+ArialMT"))
+2288         if head and body:
+2289             fc = tools.call("board_pdf_translate_fill",
+2290                             {"job": cid, "page": 1,
+2291                              "blocks": {head["id"]: "Цветной заголовок",
+2292                                         body["id"]: "Чёрный текст об устройстве."}})
+2293             show("color fill", fc, "progress")
+2294             fin_c = tools.call("board_pdf_translate_finish",
+2295                                {"job": cid, "out": p("color_mirror.pdf"),
+2296                                 "overwrite": True, "place": False})
+2297             show("finish color default", fin_c, "pages", "facing_style")
+2298             expect("color job one page", fin_c.get("pages") == 1)
+2299             expect("color job default mirror",
+2300                    fin_c.get("facing_style") == "mirror")
+2301             if fin_c.get("ok"):
+2302                 out_page = _reader(p("color_mirror.pdf")).pages[0]
+2303                 cols = {c for _, _, c in _text_colors(out_page)}
+2304                 expect("red survives mirror", "#cc0000" in cols)
+2305                 expect("black survives mirror", "#000000" in cols)
+2306                 ct = out_page.extract_text() or ""
+2307                 expect("color russian present", "Цветной" in ct)
+2308         # ---- text inside a form container (v7, the cover case) ---------
+2309         from pypdf import PdfReader as _PR
+2310         from pypdf.generic import (ArrayObject, FloatObject,
+2311                                    DictionaryObject as _DO,
+2312                                    NameObject as _NO)
+2313         buf = _io.BytesIO()
+2314         cv = _cv.Canvas(buf, pagesize=(297, 420))
+2315         cv.setFillColor(HexColor("#808080"))
+2316         cv.rect(40, 40, 217, 340, fill=1, stroke=0)
+2317         cv.showPage()
+2318         cv.save()
+2319         w = PdfWriter(clone_from=_PR(_io.BytesIO(buf.getvalue())))
+2320         pg = w.pages[0]
+2321         helv = _DO({_NO("/Type"): _NO("/Font"),
+2322                     _NO("/Subtype"): _NO("/Type1"),
+2323                     _NO("/BaseFont"): _NO("/Helvetica")})
+2324         form = DecodedStreamObject()
+2325         form.set_data(b"1 1 1 rg BT /F1 16 Tf 1 0 0 1 60 380 Tm "
+2326                       b"(COVER TITLE) Tj ET")
+2327         form[_NO("/Type")] = _NO("/XObject")
+2328         form[_NO("/Subtype")] = _NO("/Form")
+2329         form[_NO("/BBox")] = ArrayObject([FloatObject(v)
+2330                                           for v in (0, 0, 297, 420)])
+2331         form[_NO("/Resources")] = _DO(
+2332             {_NO("/Font"): _DO({_NO("/F1"): helv})})
+2333         fref = w._add_object(form)
+2334         res = _DO(pg.get("/Resources") or {})
+2335         res[_NO("/XObject")] = _DO({_NO("/Fm0"): fref})
+2336         pg[_NO("/Resources")] = res
+2337         cs = ContentStream(pg.get_contents(), w)
+2338         cs.operations.append(([_NO("/Fm0")], b"Do"))
+2339         pg.replace_contents(cs)
+2340         _save(w, p("formcover.pdf"))
+2341         st_f = tools.call("board_pdf_translate_start",
+2342                           {"path": p("formcover.pdf"), "restart": True})
+2343         show("start formcover", st_f, "modes")
+2344         fid = st_f.get("job")
+2345         jf = job_of(fid)
+2346         fb = next((b for b in jf["blocks"].get("1", [])
+2347                    if "COVER" in b["text"]), None)
+2348         expect("form text found", fb is not None)
+2349         expect("form white colour", fb is not None
+2350                and fb.get("color") == "#ffffff")
+2351         if fb:
+2352             tools.call("board_pdf_translate_fill",
+2353                        {"job": fid, "page": 1,
+2354                         "blocks": {fb["id"]: "ОБЛОЖКА"}})
+2355             fin_f = tools.call("board_pdf_translate_finish",
+2356                                {"job": fid, "out": p("formcover_ru.pdf"),
+2357                                 "overwrite": True, "place": False})
+2358             show("finish formcover", fin_f, "pages", "mirror")
+2359             expect("formcover one page", fin_f.get("pages") == 1)
+2360             mf = fin_f.get("mirror") or {}
+2361             expect("formcover mirrored", 1 in (mf.get("mirrored") or []))
+2362             expect("formcover no extra", not mf.get("fallback"))
+2363             if fin_f.get("ok"):
+2364                 fp = _reader(p("formcover_ru.pdf")).pages[0]
+2365                 ft = fp.extract_text() or ""
+2366                 expect("formcover russian", "ОБЛОЖКА" in ft)
+2367                 expect("formcover english lifted", "COVER TITLE" not in ft)
+2368                 fcols = {c for _, _, c in _text_colors(fp)}
+2369                 expect("formcover white kept", "#ffffff" in fcols)
+2370         # ---- narrow column: horizontal squeeze, never extra pages ------
+2371         buf = _io.BytesIO()
+2372         cv = _cv.Canvas(buf, pagesize=(297, 420))
+2373         cv.setFont(_font_name(), 12)
+2374         cv.drawString(72, 380, "OK")
+2375         cv.drawString(72, 360, "Next line.")
+2376         cv.showPage()
+2377         cv.save()
+2378         with open(p("narrow.pdf"), "wb") as stream:
+2379             stream.write(buf.getvalue())
+2380         st_n = tools.call("board_pdf_translate_start",
+2381                           {"path": p("narrow.pdf"), "restart": True})
+2382         nid = st_n.get("job")
+2383         jn = job_of(nid)
+2384         nb = next((b for b in jn["blocks"].get("1", [])
+2385                    if b["text"].strip() == "OK"), None)
+2386         ob = next((b for b in jn["blocks"].get("1", [])
+2387                    if b["text"].strip() == "Next line."), None)
+2388         if nb and ob:
+2389             tools.call("board_pdf_translate_fill",
+2390                        {"job": nid, "page": 1,
+2391                         "blocks": {nb["id"]: long_ru,
+2392                                    ob["id"]: "Next line."},
+2393                         "on_overflow": "facing"})
+2394             fin_n = tools.call("board_pdf_translate_finish",
+2395                                {"job": nid, "out": p("narrow_ru.pdf"),
+2396                                 "overwrite": True, "place": False})
+2397             show("finish narrow", fin_n, "pages", "mirror")
+2398             expect("narrow one page", fin_n.get("pages") == 1)
+2399             mn = fin_n.get("mirror") or {}
+2400             expect("narrow mirrored", 1 in (mn.get("mirrored") or []))
+2401             expect("narrow squeezed fits", not mn.get("unplaced"))
+2402             if fin_n.get("ok"):
+2403                 nt = _reader(p("narrow_ru.pdf")).pages[0].extract_text() or ""
+2404                 expect("narrow russian present", "Очень" in nt)
+2405                 expect("narrow neighbour kept", "Next line." in nt)
+2406         # ---- v8 guard: vertical clearance to the neighbour below -------
+2407         buf = _io.BytesIO()
+2408         cv = _cv.Canvas(buf, pagesize=(297, 420))
+2409         cv.setFont(_font_name(), 12)
+2410         cv.drawString(40, 380, "TECHNICAL SPECIFICATIONS OF THE DEVICE")
+2411         cv.drawString(40, 366, chr(0x2022) + " Parameter value table header")
+2412         cv.showPage()
+2413         cv.save()
+2414         with open(p("overlap.pdf"), "wb") as stream:
+2415             stream.write(buf.getvalue())
+2416         st_o = tools.call("board_pdf_translate_start",
+2417                           {"path": p("overlap.pdf"), "restart": True})
+2418         oid = st_o.get("job")
+2419         jo = job_of(oid)
+2420         send_o = {}
+2421         for b in jo["blocks"].get("1", []):
+2422             if b["text"].startswith("TECHNICAL"):
+2423                 send_o[b["id"]] = ("ТЕХНИЧЕСКИЕ ХАРАКТЕРИСТИКИ "
+2424                                    "УСТРОЙСТВА И КОМПЛЕКТУЮЩИХ")
+2425             else:
+2426                 send_o[b["id"]] = "Шапка таблицы параметров и значений"
+2427         tools.call("board_pdf_translate_fill",
+2428                    {"job": oid, "page": 1, "blocks": send_o,
+2429                     "on_overflow": "facing"})
+2430         fin_o = tools.call("board_pdf_translate_finish",
+2431                            {"job": oid, "out": p("overlap_ru.pdf"),
+2432                             "overwrite": True, "place": False})
+2433         show("finish overlap guard", fin_o, "pages", "mirror")
+2434         expect("overlap guard one page", fin_o.get("pages") == 1)
+2435         jo = job_of(oid)
+2436         allb = jo["blocks"].get("1", []) + jo["locked"].get("1", [])
+2437         tr = jo["translations"].get("1", {})
+2438         clash = 0
+2439         for b in jo["blocks"].get("1", []):
+2440             t = tr.get(b["id"], b["text"])
+2441             tgt = _expanded_block(b, allb)
+2442             ls, size, over, lead, hs = _fit_block(
+2443                 tgt, t, _block_font(b), MIRROR_SCALE,
+2444                 floor_abs=MIRROR_FLOOR, tight=True)
+2445             bottom = b["first_y"] - (len(ls) - 1) * size * lead - 0.30 * size
+2446             for o in allb:
+2447                 if o is b:
+2448                     continue
+2449                 top = o["first_y"] + 0.75 * o["size"]
+2450                 if top < b["first_y"] and bottom < top + 0.9 \
+2451                    and o["x0"] < b.get("x_room", b["x1"]) \
+2452                    and b["x0"] < o.get("x_room", o["x1"]):
+2453                     clash += 1
+2454         expect("no vertical clash", clash == 0)
+2455         # ---- v8 guard: identical translation is left untouched ---------
+2456         buf = _io.BytesIO()
+2457         cv = _cv.Canvas(buf, pagesize=(297, 420))
+2458         cv.setFont(_font_name(), 12)
+2459         cv.drawString(40, 380, "Уже русский текст.")
+2460         cv.showPage()
+2461         cv.save()
+2462         with open(p("same.pdf"), "wb") as stream:
+2463             stream.write(buf.getvalue())
+2464         st_s = tools.call("board_pdf_translate_start",
+2465                           {"path": p("same.pdf"), "restart": True})
+2466         sid = st_s.get("job")
+2467         js = job_of(sid)
+2468         sblocks = js["blocks"].get("1", [])
+2469         expect("identical source blocks", len(sblocks) >= 1)
+2470         tools.call("board_pdf_translate_fill",
+2471                    {"job": sid, "page": 1,
+2472                     "blocks": {b["id"]: b["text"] for b in sblocks}})
+2473         fin_s = tools.call("board_pdf_translate_finish",
+2474                            {"job": sid, "out": p("same_ru.pdf"),
+2475                             "overwrite": True, "place": False})
+2476         show("finish identical", fin_s, "pages", "mirror")
+2477         expect("identical one page", fin_s.get("pages") == 1)
+2478         if fin_s.get("ok"):
+2479             st_text = _reader(p("same_ru.pdf")).pages[0].extract_text() or ""
+2480             expect("identical kept once", st_text.count("Уже русский") == 1)
+2481         # ---- v8c guard: hard breaks reflow, no clash, file audited -----
+2482         buf = _io.BytesIO()
+2483         cv = _cv.Canvas(buf, pagesize=(297, 420))
+2484         cv.setFont(_font_name(), 10)
+2485         cv.drawString(30, 380, "First line of the paragraph goes here.")
+2486         cv.drawString(30, 368, "Second line follows right below it.")
+2487         cv.showPage()
+2488         cv.save()
+2489         with open(p("reflow.pdf"), "wb") as stream:
+2490             stream.write(buf.getvalue())
+2491         st_r = tools.call("board_pdf_translate_start",
+2492                           {"path": p("reflow.pdf"), "restart": True})
+2493         rid = st_r.get("job")
+2494         jr = job_of(rid)
+2495         send_r = {}
+2496         for b in jr["blocks"].get("1", []):
+2497             if b["text"].startswith("First"):
+2498                 send_r[b["id"]] = ("Первая строка абзаца расположена здесь.\n"
+2499                                    "Проверьте остальное содержимое коробки.")
+2500             else:
+2501                 send_r[b["id"]] = "Вторая строка идёт сразу под ней."
+2502         tools.call("board_pdf_translate_fill",
+2503                    {"job": rid, "page": 1, "blocks": send_r,
+2504                     "on_overflow": "facing"})
+2505         fin_rf = tools.call("board_pdf_translate_finish",
+2506                             {"job": rid, "out": p("reflow_ru.pdf"),
+2507                              "overwrite": True, "place": False})
+2508         show("finish reflow", fin_rf, "pages", "mirror")
+2509         expect("reflow one page", fin_rf.get("pages") == 1)
+2510         expect("reflow no leftovers",
+2511                not (fin_rf.get("mirror") or {}).get("leftovers"))
+2512         expect("formcover audited",
+2513                not (fin_f.get("mirror") or {}).get("leftovers"))
+2514         jr = job_of(rid)
+2515         allr = jr["blocks"].get("1", []) + jr["locked"].get("1", [])
+2516         trr = jr["translations"].get("1", {})
+2517         clash_r = 0
+2518         for b in jr["blocks"].get("1", []):
+2519             t = trr.get(b["id"], b["text"])
+2520             tgt = _expanded_block(b, allr)
+2521             ls, size, over, lead, hs = _fit_block(
+2522                 tgt, t, _block_font(b), MIRROR_SCALE,
+2523                 floor_abs=MIRROR_FLOOR, tight=True)
+2524             bottom = b["first_y"] - (len(ls) - 1) * size * lead - 0.30 * size
+2525             for o in allr:
+2526                 if o is b:
+2527                     continue
+2528                 top = o["first_y"] + 0.75 * o["size"]
+2529                 if top < b["first_y"] and bottom < top + 0.9 \
+2530                    and o["x0"] < tgt.get("x_room", tgt["x1"]) \
+2531                    and tgt["x0"] < o.get("x_room", o["x1"]):
+2532                     clash_r += 1
+2533         expect("reflow no clash", clash_r == 0)
+2534         if fin_rf.get("ok"):
+2535             rt = _reader(p("reflow_ru.pdf")).pages[0].extract_text() or ""
+2536             expect("reflow russian present", "Первая строка" in rt)
+2537             expect("reflow english lifted", "First line" not in rt)
+2538         if placed:
+2539             tools.call("board_delete", {"uids": placed})
+2540         print("GUARD FAILS:", len(fails), fails)
+2541         print("files are in ->", folder)
+2542         print("DONE - close the window to exit")
+2543 
+2544     QTimer.singleShot(800, run)
+2545     sys.exit(app.exec())
+2546 
+2547 
+2548 if __name__ == "__main__":
+2549     _selftest()

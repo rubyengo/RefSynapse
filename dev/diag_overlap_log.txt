@@ -1,0 +1,123 @@
+PAGES 6 modes {'1': 'facing', '2': 'facing', '3': 'facing', '4': 'facing', '5': 'facing', '6': 'facing'}
+== page 1 mode=facing blocks=5
+  ENGLISH SURVIVED t3 'MK-740'
+  ENGLISH SURVIVED t4 'MK-742'
+  ENGLISH SURVIVED t5 'www.sven.fi'
+== page 2 mode=facing blocks=36
+  ENGLISH SURVIVED t11 'ENG ........................................................'
+  ENGLISH SURVIVED t12 'Unpack the device carefully. Make sure there are no accessor'
+  ENGLISH SURVIVED t14 'Check up the package contents and availability of the warran'
+  ENGLISH SURVIVED t17 'Do not switch on the speaker system immediately after you br'
+  ENGLISH SURVIVED t19 'Before installing and using the speaker system, read this Ma'
+  ENGLISH SURVIVED t21 'Shipping and transportation equipment is permitted only in t'
+  ENGLISH SURVIVED t22 'Does not require special conditions for realization.'
+  ENGLISH SURVIVED t23 'Dispose of in accordance with regulations for the disposal o'
+  ENGLISH SURVIVED t25 'The date of manufacture of the product is indicated on the b'
+  ENGLISH SURVIVED t29 'Microphone: MK-740 — 1 pc, MK-742 — 2 pcs'
+  ENGLISH SURVIVED t30 'Receiver — 1 pc'
+  ENGLISH SURVIVED t31 'Microphone stand (MK-740 — 1 pc, MK-742 — 2 pcs)'
+  ENGLISH SURVIVED t32 'Microphone holder for stands and tripods (MK-740 - 1pc, MK-7'
+  ENGLISH SURVIVED t33 'USB to USB type-C power cable — 1 pc'
+  ENGLISH SURVIVED t34 'User Manual — 1 pc'
+  ENGLISH SURVIVED t35 'Warranty card — 1 pc'
+  OVERLAP t5 into t6 bottom=311.9 top=315.2
+  OVERLAP t6 into t7 bottom=309.2 top=308.9
+  OVERLAP t8 into t9 bottom=294.3 top=294.1
+  OVERLAP t9 into t10 bottom=264.0 top=266.7
+  OVERLAP t12 into t13 bottom=227.8 top=231.2
+  OVERLAP t14 into t15 bottom=212.7 top=212.3
+  OVERLAP t15 into k5 bottom=200.2 top=206.0
+  OVERLAP t16 into t17 bottom=193.6 top=193.4
+  OVERLAP t16 into k6 bottom=193.6 top=193.4
+  OVERLAP t17 into t18 bottom=187.3 top=187.1
+  OVERLAP t18 into t19 bottom=174.7 top=174.5
+  OVERLAP t18 into k8 bottom=174.7 top=174.5
+  OVERLAP t19 into t20 bottom=168.4 top=168.2
+  OVERLAP t20 into t21 bottom=158.6 top=161.9
+  OVERLAP t20 into k9 bottom=158.6 top=161.9
+  OVERLAP t21 into t22 bottom=155.9 top=155.6
+  OVERLAP t22 into t23 bottom=149.5 top=149.3
+  OVERLAP t23 into t24 bottom=143.2 top=143.0
+  OVERLAP t24 into t25 bottom=136.9 top=136.7
+  OVERLAP t24 into k12 bottom=136.9 top=136.7
+  OVERLAP t26 into t27 bottom=122.1 top=121.9
+  OVERLAP t28 into t29 bottom=101.0 top=100.8
+  OVERLAP t28 into k13 bottom=101.0 top=100.8
+  OVERLAP t29 into t30 bottom=94.7 top=94.5
+  OVERLAP t30 into t31 bottom=88.4 top=88.2
+  OVERLAP t31 into t32 bottom=82.3 top=81.9
+  OVERLAP t32 into t33 bottom=75.9 top=75.6
+  OVERLAP t33 into t34 bottom=69.5 top=69.3
+== page 3 mode=facing blocks=37
+  OVERLAP t3 into t4 bottom=338.7 top=338.5
+  OVERLAP t3 into k1 bottom=338.7 top=338.5
+  OVERLAP t4 into t5 bottom=332.5 top=332.2
+  OVERLAP t5 into t6 bottom=326.1 top=325.9
+  OVERLAP t6 into t7 bottom=320.0 top=319.6
+  OVERLAP t6 into k3 bottom=320.0 top=319.6
+  OVERLAP t8 into t9 bottom=305.0 top=304.8
+  OVERLAP t8 into k4 bottom=305.0 top=304.8
+  OVERLAP t9 into t10 bottom=298.7 top=298.5
+  OVERLAP t10 into t11 bottom=292.4 top=292.2
+  OVERLAP t11 into t12 bottom=286.1 top=285.9
+  OVERLAP t12 into t13 bottom=279.8 top=279.6
+  OVERLAP t13 into t14 bottom=273.6 top=273.3
+  OVERLAP t14 into t15 bottom=267.4 top=267.0
+  OVERLAP t15 into t16 bottom=260.9 top=260.7
+  OVERLAP t15 into k10 bottom=260.9 top=260.7
+  OVERLAP t16 into t17 bottom=254.8 top=254.4
+  OVERLAP t18 into t19 bottom=242.1 top=241.8
+  OVERLAP t19 into t20 bottom=235.7 top=235.5
+  OVERLAP t20 into t21 bottom=229.4 top=229.2
+  OVERLAP t21 into t22 bottom=223.1 top=222.9
+  OVERLAP t23 into t24 bottom=210.5 top=210.3
+  OVERLAP t25 into t26 bottom=195.7 top=195.5
+== page 4 mode=facing blocks=25
+  ENGLISH SURVIVED t6 'Connect the microphone and receiver to the USB port of your '
+  ENGLISH SURVIVED t8 'The battery is used as an integral part of the equipment, so'
+  ENGLISH SURVIVED t13 'Turn on the receiver by long pressing the button c. The gree'
+  ENGLISH SURVIVED t14 'Connect the receiver to the 6.3 mm jack connector of the spe'
+  ENGLISH SURVIVED t16 'Adjust the required volume using buttons d and e.'
+  ENGLISH SURVIVED t19 'Turn on the microphone. The green indicator on the microphon'
+  ENGLISH SURVIVED t20 'Turn on the receiver. The yellow (yellow and/or blue for the'
+  ENGLISH SURVIVED t22 'Quickly press the power button c 10 times on the receiver.'
+  ENGLISH SURVIVED t23 'Quickly press the power button a 10 times on the microphone.'
+  ENGLISH SURVIVED t24 'After this, the microphone and receiver will be paired. The '
+  OVERLAP t4 into t5 bottom=323.7 top=327.2
+  OVERLAP t5 into t6 bottom=321.1 top=320.9
+  OVERLAP t5 into k1 bottom=321.1 top=320.9
+  OVERLAP t6 into t7 bottom=314.8 top=314.6
+  OVERLAP t8 into t9 bottom=289.6 top=289.4
+  OVERLAP t9 into t10 bottom=277.4 top=280.9
+  OVERLAP t10 into t11 bottom=274.8 top=274.6
+  OVERLAP t11 into t12 bottom=262.6 top=266.1
+  OVERLAP t12 into t13 bottom=260.2 top=259.8
+  OVERLAP t12 into k3 bottom=260.2 top=259.8
+  OVERLAP t13 into t14 bottom=250.0 top=253.5
+  OVERLAP t14 into t15 bottom=247.4 top=247.2
+  OVERLAP t15 into t16 bottom=234.8 top=234.6
+  OVERLAP t15 into k5 bottom=234.8 top=234.6
+  OVERLAP t17 into t18 bottom=220.0 top=219.8
+  OVERLAP t18 into t19 bottom=201.1 top=200.9
+  OVERLAP t18 into k6 bottom=201.1 top=200.9
+  OVERLAP t19 into t20 bottom=194.8 top=194.6
+  OVERLAP t20 into t21 bottom=188.5 top=188.3
+  OVERLAP t21 into t22 bottom=182.2 top=182.0
+  OVERLAP t21 into k8 bottom=182.2 top=182.0
+  OVERLAP t22 into t23 bottom=172.2 top=175.7
+  OVERLAP t23 into t24 bottom=165.9 top=169.4
+  OVERLAP t24 into t25 bottom=163.3 top=163.1
+== page 5 mode=facing blocks=21
+  OVERLAP t3 into t4 bottom=331.7 top=334.8
+  OVERLAP t11 into t12 bottom=273.9 top=277.0
+== page 6 mode=facing blocks=17
+  ENGLISH SURVIVED t4 'Модель: MK-740, MK-742'
+  ENGLISH SURVIVED t5 'Уполномоченная организация и импор\nтер в России: OOO «Регард'
+  ENGLISH SURVIVED t7 'Срок службы: 2 года.'
+  ENGLISH SURVIVED t8 'Производитель: «СВЕН ПТЕ. Лимитед», 176\nДжу Чиат Роуд, № 02-'
+  ENGLISH SURVIVED t9 'Произведено под контролем «Свен Скан\nдинавия Лимитед», 48310'
+  ENGLISH SURVIVED t10 'ка, Котолахдентие, 15. Сделано в Китае.'
+  ENGLISH SURVIVED t14 'MK-740'
+  ENGLISH SURVIVED t16 '4L1228'
+  ENGLISH SURVIVED t17 'MK-742'
+  OVERLAP t9 into k3 bottom=113.6 top=119.1

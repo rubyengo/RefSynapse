@@ -1,0 +1,20 @@
+surgical ok=True rem=(757, [])
+surg /Contents=ContentStream streams=1
+   stream0 len=6758 md5=7c167656 has_english=False
+add_only rem=(757, [])
+w1 /Contents=ContentStream streams=1
+   stream0 len=6758 md5=7c167656 has_english=False
+reread rem=(636, ['t13', 't14', 't16', 't19', 't20', 't22', 't23', 't24', 't6', 't8'])
+r2 /Contents=DecodedStreamObject streams=1
+   stream0 len=6758 md5=7c167656 has_english=False
+reread_add rem=(636, ['t13', 't14', 't16', 't19', 't20', 't22', 't23', 't24', 't6', 't8'])
+reread_add_merge rem=(636, ['t13', 't14', 't16', 't19', 't20', 't22', 't23', 't24', 't6', 't8'])
+PAGE2 geometry:
+  t12 x0=29.2 x1=271.4 x_room=278.9 first_y=233.2 y_bot=231.4 size=5.80 'Unpack the device carefully. Make su'
+  t13 x0=24.1 x1=276.9 x_room=278.9 first_y=226.8 y_bot=218.8 size=5.80 'the device for damage; if the produc'
+  t15 x0=24.1 x1=270.3 x_room=277.2 first_y=207.9 y_bot=199.9 size=5.80 'ranty card has a shop stamp, a legib'
+  t16 x0=24.1 x1=248.9 x_room=260.5 first_y=195.3 y_bot=193.6 size=5.80 'ranty card loss or discrepancy of nu'
+  k4 x0=271.7 x1=273.5 x_room=278.9 first_y=214.2 y_bot=212.5 size=5.80 '-'
+  k5 x0=271.7 x1=273.5 x_room=278.9 first_y=201.6 y_bot=199.9 size=5.80 '-'
+  k6 x0=24.1 x1=28.9 x_room=28.9 first_y=189.0 y_bot=187.3 size=5.80 '•'
+t12 translation has newline=True text='Распакуйте устройство осторожно. Убедитесь, что в коробке не осталось аксессуаров.\nПроверьте'

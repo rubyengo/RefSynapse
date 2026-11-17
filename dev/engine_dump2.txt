@@ -1,0 +1,330 @@
+----- 253-296 -----
+253 def _classify(blocks):
+254     locked, ready = [], []
+255     for block in blocks:
+256         text = block["text"]
+257         if not re.search(r"[A-Za-zЀ-ӿ]", text):
+258             locked.append(block)
+259             continue
+260         if _junk_ratio(text) > 0.2:
+261             locked.append(block)
+262             continue
+263         if _bad_glyphs(text):
+264             cleaned = "".join(" " if _junk(ch) else ch for ch in text)
+265             cleaned = re.sub(r"[ \t]+", " ", cleaned).strip()
+266             block = dict(block)
+267             block["text"] = cleaned
+268         ready.append(block)
+269     return locked, ready
+270 
+271 
+272 def _readable_locked(block):
+273     text = str(block.get("text", ""))
+274     if not re.search(r"[A-Za-z0-9Ѐ-ӿ]", text):
+275         return False
+276     return _junk_ratio(text) <= 0.2
+277 
+278 
+279 def _capacity(block):
+280     width = max(block.get("x_room", block["x1"]) - block["x0"] + 2.0, 8.0)
+281     step = block["size"] * block["leading"]
+282     rows = max(1, int((block["first_y"] - block["y_bot"]) / step) + 1)
+283     per_row = max(1, int(width / (0.52 * block["size"])))
+284     return max(4, int(per_row * rows))
+285 
+286 
+287 def _outside(page, spans):
+288     width = float(page.mediabox.width)
+289     height = float(page.mediabox.height)
+290     for span in spans:
+291         if (span["x"] < -1 or span["y"] < -1
+292                 or span["x"] > width + 1 or span["y"] > height + 1):
+293             return True
+294     return False
+295 
+296 
+----- 849-998 -----
+849 def _group_blocks(spans, page_w=595.0):
+850     if len(spans) > MAX_SPANS_PER_PAGE:
+851         raise ToolError("too dense (%d text pieces)" % len(spans))
+852     ordered = sorted(spans, key=lambda s: (-s["y"], s["x"]))
+853     lines = []
+854     for span in ordered:
+855         for line in lines:
+856             if abs(line["y"] - span["y"]) <= max(
+857                     1.5, 0.35 * max(line["size"], span["size"])):
+858                 line["parts"].append(span)
+859                 break
+860         else:
+861             lines.append({"y": span["y"], "size": span["size"],
+862                           "parts": [span]})
+863     starts = {}
+864     for line in lines:
+865         for x in {round(p["x"], 1) for p in line["parts"]}:
+866             starts[x] = starts.get(x, 0) + 1
+867     columns = {x for x, count in starts.items() if count >= 2}
+868     segments = []
+869     for line in lines:
+870         parts = sorted(line["parts"], key=lambda s: s["x"])
+871         current = [parts[0]]
+872         for span in parts[1:]:
+873             prev = current[-1]
+874             gap = span["x"] - (prev["x"] + prev["w"])
+875             if (gap > max(4.0, 0.9 * line["size"])
+876                     or (round(span["x"], 1) in columns and gap > -2.0)):
+877                 segments.append(current)
+878                 current = [span]
+879             else:
+880                 current.append(span)
+881         segments.append(current)
+882     rows = []
+883     for parts in segments:
+884         main = max(parts, key=lambda s: s["size"])
+885         text = parts[0]["text"]
+886         for prev, span in zip(parts, parts[1:]):
+887             gap = span["x"] - (prev["x"] + prev["w"])
+888             sep = " " if gap > 0.25 * main["size"] else ""
+889             if sep and text.endswith(" "):
+890                 sep = ""
+891             text += sep + span["text"]
+892         rows.append({"x0": min(s["x"] for s in parts),
+893                      "x1": max(s["x"] + s["w"] for s in parts),
+894                      "y": main["y"], "size": main["size"],
+895                      "text": re.sub(r"\s+", " ", text).strip(),
+896                      "font": main["font"]})
+897     rows = [r for r in rows if r["text"]]
+898     if not rows:
+899         return []
+900     right = max(r["x1"] for r in rows)
+901     for row in rows:
+902         neighbours = [other["x0"] for other in rows
+903                       if other is not row
+904                       and abs(other["y"] - row["y"]) <= max(
+905                           1.5, 0.35 * row["size"])
+906                       and other["x0"] > row["x1"] - 0.5]
+907         limit = min(neighbours) - 2.0 if neighbours else page_w - 8.0
+908         row["room"] = max(row["x1"],
+909                           min(limit, row["x1"] + 2.0 * row["size"],
+910                               right + 2.0, page_w - 4.0))
+911     rows.sort(key=lambda r: (-r["y"], r["x0"]))
+912     blocks = []
+913     for row in rows:
+914         joined = False
+915         if blocks:
+916             block = blocks[-1]
+917             last = block["lines"][-1]
+918             step = last["y"] - row["y"]
+919             size = block["size"]
+920             bullet = row["text"].lstrip().startswith(BULLET_STARTS)
+921             same_x = abs(row["x0"] - block["x0"]) <= 2.5
+922             indent = 0 < row["x0"] - block["x0"] <= 2.0 * row["size"]
+923             prose = (last["x1"] - last["x0"]) >= 15.0 * last["size"]
+924             if (not bullet
+925                     and prose
+926                     and (same_x or indent)
+927                     and _style(row["font"]) == _style(block["font"])
+928                     and row["x0"] < block["x1"] + 2.0
+929                     and 0.55 * size <= step <= 1.5 * size
+930                     and 0.8 <= row["size"] / size <= 1.25):
+931                 block["lines"].append(row)
+932                 block["x1"] = max(block["x1"], row["x1"])
+933                 joined = True
+934         if not joined:
+935             blocks.append({"x0": row["x0"], "x1": row["x1"],
+936                            "size": row["size"], "font": row["font"],
+937                            "lines": [row]})
+938     result = []
+939     for number, block in enumerate(blocks, 1):
+940         lines = block["lines"]
+941         size = block["size"]
+942         steps = [a["y"] - b["y"] for a, b in zip(lines, lines[1:])]
+943         if steps:
+944             steps.sort()
+945             leading = steps[len(steps) // 2] / size
+946             leading = min(1.45, max(1.05, leading))
+947         else:
+948             leading = 1.2
+949         result.append({"id": "b%d" % number,
+950                        "x0": round(block["x0"], 2),
+951                        "x1": round(block["x1"], 2),
+952                        "x_room": round(max(l["room"] for l in lines), 2),
+953                        "first_y": round(lines[0]["y"], 2),
+954                        "y_bot": round(lines[-1]["y"] - 0.30 * size, 2),
+955                        "size": round(size, 2),
+956                        "leading": round(leading, 3),
+957                        "font": block["font"],
+958                        "text": "\n".join(l["text"] for l in lines)})
+959     if len(result) > MAX_BLOCKS_PER_PAGE:
+960         raise ToolError("too many text blocks (%d)" % len(result))
+961     return result
+962 
+963 
+964 def _forms_have_text(page):
+965     try:
+966         resources = _resolve(page.get("/Resources", {})) or {}
+967     except Exception:
+968         return False
+969     stack, seen = [resources], set()
+970     pattern = re.compile(rb"(?<![\w])(Tj|TJ)(?![\w])")
+971     while stack and len(seen) < 60:
+972         res = _resolve(stack.pop())
+973         if not res or id(res) in seen:
+974             continue
+975         seen.add(id(res))
+976         try:
+977             xobjects = _resolve(res.get("/XObject", {})) or {}
+978         except Exception:
+979             continue
+980         for ref in xobjects.values():
+981             obj = _resolve(ref)
+982             try:
+983                 if obj.get("/Subtype") != "/Form":
+984                     continue
+985                 if pattern.search(obj.get_data()):
+986                     return True
+987                 inner = _resolve(obj.get("/Resources", {}))
+988                 if inner:
+989                     stack.append(inner)
+990             except Exception:
+991                 continue
+992     return False
+993 
+994 
+995 # -------------------------------------------------------------------- fonts
+996 _VARIANTS = {}
+997 
+998 
+----- 1452-1584 -----
+1452     def t_start(a):
+1453         _need_pdf()
+1454         src = _source(tools, a)
+1455         job_id = _job_id(src)
+1456         folder, job_file = _job_paths(sb, job_id)
+1457         if os.path.isfile(job_file) and not a.get("restart"):
+1458             job = _load_job(job_file)
+1459             if os.path.realpath(job["source_original"]) != os.path.realpath(src):
+1460                 raise ToolError("Job '%s' belongs to a different file (%s). "
+1461                                 "Pass restart:true to rebuild it, or rename "
+1462                                 "the new file."
+1463                                 % (job_id, job["source_original"]))
+1464             return _payload(job, folder, resumed=True)
+1465         if os.path.isdir(folder) and a.get("restart"):
+1466             try:
+1467                 shutil.rmtree(folder)
+1468             except OSError as ex:
+1469                 raise ToolError("Cannot reset the job folder: %s" % ex)
+1470         reader = _reader(src, a.get("password"))
+1471         total = len(reader.pages)
+1472         indices = _page_numbers(a.get("pages"), total)
+1473         if len(indices) > MAX_JOB_PAGES:
+1474             raise ToolError("This job would cover %d pages (max %d) - use "
+1475                             "'pages' to work in ranges"
+1476                             % (len(indices), MAX_JOB_PAGES))
+1477         skip = set()
+1478         if a.get("skip_pages"):
+1479             skip = set(_page_numbers(a.get("skip_pages"), total,
+1480                                      what="skip_pages"))
+1481         min_scale = float(a.get("min_scale", 0.7))
+1482         if not 0.5 <= min_scale <= 1.0:
+1483             raise ToolError("'min_scale' must be between 0.5 and 1.0")
+1484         try:
+1485             os.makedirs(folder, exist_ok=True)
+1486             shutil.copyfile(src, os.path.join(folder, "source.pdf"))
+1487         except OSError as ex:
+1488             raise ToolError("Cannot prepare the job folder: %s" % ex)
+1489         base_writer = PdfWriter(clone_from=reader)
+1490         mode, status, blocks, locked = {}, {}, {}, {}
+1491         warnings = []
+1492         for index in indices:
+1493             number = index + 1
+1494             key = str(number)
+1495             page = reader.pages[index]
+1496             try:
+1497                 spans = _page_spans(page)
+1498             except ToolError as ex:
+1499                 mode[key], status[key] = "kept", "kept"
+1500                 warnings.append("page %d: %s - left in the original language"
+1501                                 % (number, ex))
+1502                 continue
+1503             if not spans:
+1504                 mode[key], status[key] = "empty", "empty"
+1505                 continue
+1506             if index in skip:
+1507                 mode[key], status[key] = "kept", "kept"
+1508                 continue
+1509             try:
+1510                 found = _group_blocks(spans, float(page.mediabox.width))
+1511             except ToolError as ex:
+1512                 mode[key], status[key] = "kept", "kept"
+1513                 warnings.append("page %d is %s - left in the original language"
+1514                                 % (number, ex))
+1515                 continue
+1516             keep_blocks, ready = _classify(found)
+1517             if not ready:
+1518                 mode[key], status[key] = "kept", "kept"
+1519                 continue
+1520             joined = "".join(s["text"] for s in spans)
+1521             unreadable = (_junk_ratio(joined) > 0.05
+1522                           or _outside(page, spans)
+1523                           or any(_bad_glyphs(b["text"]) for b in keep_blocks))
+1524             cramped = [b for b in ready
+1525                        if (b.get("x_room", b["x1"]) - b["x0"]) < 40
+1526                        and len(b["text"]) > 25]
+1527             whole = re.sub(r"\s", "", page.extract_text() or "")
+1528             captured = sum(len(re.sub(r"\s", "", b["text"]))
+1529                            for b in keep_blocks + ready)
+1530             covered = (captured / float(len(whole))) if whole else 1.0
+1531             if covered < 0.92:
+1532                 warnings.append("page %d: only %d%% of its wording could be "
+1533                                 "measured - mirror will redraw it fully"
+1534                                 % (number, int(100 * covered)))
+1535             chosen = "facing" if (unreadable or cramped or len(ready) > 45
+1536                                   or covered < 0.92) else "inplace"
+1537             if chosen == "inplace":
+1538                 try:
+1539                     stripped = _strip_page(base_writer, index)
+1540                 except Exception:
+1541                     stripped = False
+1542                 if not stripped:
+1543                     chosen = "facing"
+1544                 else:
+1545                     before = len(re.sub(r"\s", "", page.extract_text() or ""))
+1546                     after = len(re.sub(r"\s", "",
+1547                                        base_writer.pages[index].extract_text()
+1548                                        or ""))
+1549                     if after > max(20, 0.05 * before):
+1550                         chosen = "facing"
+1551                         warnings.append("page %d: its wording cannot be lifted "
+1552                                         "out cleanly - mirror will redraw it "
+1553                                         "fully" % number)
+1554             samples = _text_colors(page)
+1555             ready_out = []
+1556             for position, block in enumerate(ready, 1):
+1557                 item = dict(block)
+1558                 item["id"] = "t%d" % position
+1559                 item["max_chars"] = _capacity(item)
+1560                 item["color"] = _block_color(item, samples)
+1561                 ready_out.append(item)
+1562             locked_out = []
+1563             for position, block in enumerate(keep_blocks, 1):
+1564                 item = dict(block)
+1565                 item["id"] = "k%d" % position
+1566                 item["color"] = _block_color(item, samples)
+1567                 locked_out.append(item)
+1568             mode[key], status[key] = chosen, "pending"
+1569             blocks[key], locked[key] = ready_out, locked_out
+1570             if int(page.rotation or 0) % 360:
+1571                 warnings.append("page %d is rotated; the wording uses the "
+1572                                 "unrotated frame" % number)
+1573         _save(base_writer, os.path.join(folder, "base.pdf"))
+1574         job = {"version": JOB_VERSION, "id": job_id,
+1575                "source": os.path.join(folder, "source.pdf"),
+1576                "source_original": os.path.realpath(src),
+1577                "source_uid": a.get("uid") or "",
+1578                "pages_total": total, "min_scale": min_scale,
+1579                "mode": mode, "status": status, "blocks": blocks,
+1580                "locked": locked, "translations": {}, "rejects": {},
+1581                "warnings": warnings}
+1582         _dump_job(job, folder)
+1583         return _payload(job, folder)
+1584 
